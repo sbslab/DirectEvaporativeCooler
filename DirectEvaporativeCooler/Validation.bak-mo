@@ -1,0 +1,29 @@
+within DirectEvaporativeCooler;
+package Validation
+  "Set of validations made for the evaporative cooler models"
+  extends Modelica.Icons.ExamplesPackage;
+
+  model Efficiency
+    extends Modelica.Icons.Example;
+    annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
+          coordinateSystem(preserveAspectRatio=false)));
+  end Efficiency;
+
+  model PressureDrop
+    extends Modelica.Icons.Example;
+    annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
+          coordinateSystem(preserveAspectRatio=false)));
+  end PressureDrop;
+
+  model PowerConsumption
+    extends Modelica.Icons.Example;
+    annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
+          coordinateSystem(preserveAspectRatio=false)));
+  end PowerConsumption;
+
+  model WaterConsumption
+    extends Modelica.Icons.Example;
+    annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
+          coordinateSystem(preserveAspectRatio=false)));
+  end WaterConsumption;
+end Validation;
