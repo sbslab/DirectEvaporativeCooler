@@ -9,7 +9,7 @@ block CoolingPadEfficiencyLumped "To compute the evaporative cooling pad efficie
 
   //Parameters
   parameter Modelica.SIunits.Thickness d " Thickness of the cooling pad in m";
-  Real Eff;
+  Real Eff( max = 1, min=0);
 
 equation
   Eff = (0.792714 + (0.958569*d) - (0.25193*v_a) - (1.03215*(d^2)) + (0.0262659*(v_a^2)) + (0.914869*(d*v_a)) - (1.4821*(v_a*(d^2)))

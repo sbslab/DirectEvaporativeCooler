@@ -19,7 +19,8 @@ block HeatTransfer
   Modelica.Blocks.Interfaces.RealInput Tdb_ou "Outlet drybulb temperature"
     annotation (Placement(transformation(extent={{-148,-58},{-100,-10}}), iconTransformation(extent={{-140,-50},{-100,-10}})));
   Modelica.Blocks.Interfaces.RealInput w_in "Inlet humidity ratio"
-    annotation (Placement(transformation(extent={{-140,0},{-100,40}}), iconTransformation(extent={{-140,70},{-100,110}})));
+    annotation (Placement(transformation(extent={{-140,-22},{-100,18}}),
+                                                                       iconTransformation(extent={{-140,70},{-100,110}})));
   Modelica.Blocks.Interfaces.RealInput w_ou "Outlet humidity ratio"
     annotation (Placement(transformation(extent={{-148,-118},{-100,-70}}), iconTransformation(extent={{-140,-110},{-100,-70}})));
   Modelica.Blocks.Interfaces.RealOutput Q_total "Total heat transfer"
@@ -38,5 +39,5 @@ equation
   annotation (
     Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},{120,120}})),
     defaultComponentName="heaTra",
-    Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},{120,120}})));
+    Diagram(coordinateSystem(preserveAspectRatio=false)));
 end HeatTransfer;

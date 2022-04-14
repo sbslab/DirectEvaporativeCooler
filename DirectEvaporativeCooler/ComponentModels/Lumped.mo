@@ -1,7 +1,8 @@
 within DirectEvaporativeCooler.ComponentModels;
 model Lumped "Model for the lumped evaporative cooling pad based on the EnergyPlus Cel-Dek pad"
 
-  extends DirectEvaporativeCooler.BaseClasses.PartialCoolingPad(dpPad(dp_nominal=dp_pad_nominal));
+  extends DirectEvaporativeCooler.BaseClasses.PartialCoolingPad(dpPad(dp_nominal=dp_pad_nominal),
+      senMasFra(initType=Modelica.Blocks.Types.Init.InitialState));
 
   BaseClasses.OutletConditions outCon annotation (Placement(transformation(extent={{-32,-10},{-12,10}})));
   BaseClasses.CoolingPadEfficiencyLumped effPhy(d=Thickness)

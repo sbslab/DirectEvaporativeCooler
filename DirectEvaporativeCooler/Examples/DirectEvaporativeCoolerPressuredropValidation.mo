@@ -32,7 +32,8 @@ Modelica.SIunits.PressureDifference dpD_nominal = 10000 "Nominal pressure drop a
         MediumAir, m_flow_nominal=1)
     annotation (Placement(transformation(extent={{10,-8},{26,8}})));
   Buildings.Fluid.Sensors.TemperatureWetBulbTwoPort senWetBul(redeclare package
-      Medium = MediumAir, m_flow_nominal=1)
+              Medium =
+               MediumAir, m_flow_nominal=1)
     annotation (Placement(transformation(extent={{34,-8},{50,8}})));
   Buildings.Fluid.FixedResistances.PressureDrop ducRes(
     redeclare package Medium = MediumAir,

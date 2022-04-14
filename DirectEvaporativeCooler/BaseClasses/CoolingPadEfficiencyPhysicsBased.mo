@@ -16,7 +16,7 @@ block CoolingPadEfficiencyPhysicsBased
   Modelica.SIunits.Pressure p_atm = 101325 " Atmospheric pressure, pa ";
   Modelica.SIunits.Area A = l * h " Area of the cooling pad, m2";
   Modelica.SIunits.Volume V = A * d "Volume of the cooling pad,m3";
-  Modelica.SIunits.Area TSA = (V * xi) "Total surface area of the cooling pad,m2";
+  Modelica.SIunits.Area TSA = 2*(l*h + h*d + d*l) "Total surface area of the cooling pad,m2";
   Modelica.SIunits.SpecificHeatCapacity Cpa = 1000 " Specific heat of air J/kg K";
   Modelica.SIunits.Density rho " Air density, kg/m3";
   Modelica.SIunits.Length le = (V/ TSA) "Characteristic length ,m";
@@ -81,20 +81,20 @@ equation
 //Step 1: Calculating Re and Pr to calculate Nusselts number
 
 rho = p_atm/(287.08*(Twb_in))    " Density of air at the wetbulb temperature";
-Re = Modelica.Fluid.Pipes.BaseClasses.CharacteristicNumbers.ReynoldsNumber(v_a,rho,Mu,l)
+Re = Modelica.Fluid.Pipes.BaseClasses.CharacteristicNumbers.ReynoldsNumber(v_a,rho,Mu,d)
  "Renyolds number";
 Pr = Modelica.Fluid.Dissipation.Utilities.Functions.General.PrandtlNumber(Cpa,Mu,ka)
  "Prandtl number";
 
 // Step 2: Nusselts number varies for different cooling pad media
-Nu = if CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Cellulose then (0.10*((le/d)^(0.12))*(Re^0.8)*(Pr^0.33))
+Nu = if CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Cellulose then (0.1*((le/d)^(0.12))*(Re^0.8)*(Pr^0.33))
   elseif CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.GlassFiber then (0.11*((le/d)^(0.12))*(Re^0.8)*(Pr^0.33))
   elseif CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Paper then (0.07*((le/d)^(0.12))*(Re^0.8) * (Pr^0.33))
   elseif CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Coir then 0.13*((le/d)^(0.12))*(Re^0.9) * (Pr^0.33)
   else (0.35*((le/d)^(0.12))*(Re^0.8) * (Pr^0.33));
 
 // Step 3: Calculating hc and hm based on Nusselts number
-hc = (Nu*k)/l    "Lewis relationship between convective heat transfer coefficient and mass transfer coefficient (Le ~ 1 for water vapour and air)";
+hc = (Nu*ka)/le    "Lewis relationship between convective heat transfer coefficient and mass transfer coefficient (Le ~ 1 for water vapour and air)";
 hm = hc/Cpa;
 
 //Step 4: Deriving the cooling pad effectiveness or efficiency

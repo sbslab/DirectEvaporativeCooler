@@ -201,8 +201,7 @@ public
         origin={63.5,-24.5})));
   replaceable
     Buildings.Fluid.MixingVolumes.BaseClasses.MixingVolumeHeatMoisturePort VolAir(nPorts=2)
-    constrainedby
-    Buildings.Fluid.MixingVolumes.BaseClasses.MixingVolumeHeatMoisturePort(
+    constrainedby Buildings.Fluid.MixingVolumes.BaseClasses.MixingVolumeHeatMoisturePort(
     redeclare final package Medium = Medium2,
     nPorts=2,
     V=m2_flow_nominal*tau2/rho2_nominal,
@@ -253,8 +252,7 @@ public
         rotation=180,
         origin={-10,60})));
   replaceable Buildings.Fluid.MixingVolumes.BaseClasses.MixingVolumeHeatPort VolWat(nPorts=3)
-    constrainedby
-    Buildings.Fluid.MixingVolumes.BaseClasses.MixingVolumeHeatPort(
+    constrainedby Buildings.Fluid.MixingVolumes.BaseClasses.MixingVolumeHeatPort(
     redeclare final package Medium = Medium1,
     nPorts=2,
     V=m1_flow_nominal*tau1/rho1_nominal,
@@ -285,8 +283,8 @@ public
         extent={{7,-7},{-7,7}},
         rotation=90,
         origin={80,-40})));
-  Buildings.Fluid.FixedResistances.PressureDrop preDro1(redeclare package Medium =
-               Medium2, m_flow_nominal=m2_flow_nominal)
+  Buildings.Fluid.FixedResistances.PressureDrop preDro1(redeclare package
+      Medium = Medium2, m_flow_nominal=m2_flow_nominal)
     annotation (Placement(transformation(extent={{23,53},{36,67}})));
   Buildings.Fluid.FixedResistances.PressureDrop preDro2(
     redeclare package Medium = Medium1,

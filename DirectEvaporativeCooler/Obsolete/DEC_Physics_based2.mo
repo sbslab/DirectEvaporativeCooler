@@ -136,8 +136,7 @@ model DEC_Physics_based2
     tau=0)
     annotation (Placement(transformation(extent={{68,-140},{82,-126}})));
   Buildings.Fluid.Sensors.RelativePressure          senRelPre(redeclare package
-                                                                                Medium =
-                       Medium2)
+              Medium = Medium2)
            annotation (Placement(transformation(extent={{2,-188},{18,-172}})));
 equation
   connect(Temperature.y, Bou_water2.T_in) annotation (Line(points={{-145,0},

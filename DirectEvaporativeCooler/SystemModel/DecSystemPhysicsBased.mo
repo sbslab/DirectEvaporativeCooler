@@ -27,7 +27,7 @@ model DecSystemPhysicsBased "Model of Direct evaporative cooling system with pum
        elseif CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Coir then 209 else 299 "Surface area per unit volume in comact with air(m2/m3)"
     annotation (Dialog(group="Cooling pad parameters"));
 
-  parameter Modelica.SIunits.Conductivity K_value=0.04 " Evaporative cooling pad thermal conductivity" annotation (Dialog(group="Cooling pad parameters"));
+  parameter Modelica.SIunits.ThermalConductivity K_value=0.04 " Evaporative cooling pad thermal conductivity" annotation (Dialog(group="Cooling pad parameters"));
   parameter Real DriftFactor=0.1 "Factor of water lost due to drift(as droplets)" annotation (Dialog(group="Water consumption"));
   parameter Real Rcon=3 "Ratio of solids in the blowdown water" annotation (Dialog(group="Water consumption"));
 
@@ -42,8 +42,21 @@ model DecSystemPhysicsBased "Model of Direct evaporative cooling system with pum
   parameter Medium.Temperature T_start=Medium.T_default "Start value of temperature" annotation (Dialog(tab="Initialization"));
   parameter Medium.MassFraction X_start[Medium.nX](final quantity=Medium.substanceNames) = Medium.X_default "Start value of mass fractions m_i/m"
     annotation (Dialog(tab="Initialization", enable=Medium.nXi > 0));
-  parameter Medium.ExtraProperty C_start[Medium.nC](final quantity=Medium.extraPropertiesNames) = fill(0, Medium.nC) "Start value of trace substances"
+ parameter Medium.ExtraProperty C_start[Medium.nC](final quantity=Medium.extraPropertiesNames) = fill(0, Medium.nC) "Start value of trace substances"
     annotation (Dialog(tab="Initialization", enable=Medium.nC > 0));
+
+replaceable parameter Buildings.Fluid.Movers.Data.Generic perFan
+    constrainedby Buildings.Fluid.Movers.Data.Generic
+    "Record with performance data for the fan";
+
+
+parameter Buildings.Fluid.Movers.Data.Generic perPum(
+   pressure(
+     V_flow=mW_flow_nominal*1000*{0,1,2},
+     dp=dp_pip_nominal*{2,1,0}))
+    "Performance data for water pumps within the evaporative cooler";
+
+
 
   //Outputs
   Modelica.Blocks.Interfaces.RealInput pumSig "Pump signal"
@@ -51,26 +64,26 @@ model DecSystemPhysicsBased "Model of Direct evaporative cooling system with pum
   Modelica.Blocks.Interfaces.RealInput fanSig "Fan signal"
     annotation (Placement(transformation(extent={{-140,10},{-100,50}}), iconTransformation(extent={{-140,10},{-100,50}})));
 
-  Buildings.Fluid.Movers.SpeedControlled_Nrpm
-                                           pump(
+  Buildings.Fluid.Movers.SpeedControlled_Nrpm fan(
     redeclare final package Medium = Medium,
+    addPowerToMedium=true,
     y_start=1,
-    redeclare parameter Buildings.Fluid.Movers.Data.Generic per,
-    inputType=Buildings.Fluid.Types.InputType.Continuous,
-    addPowerToMedium=false) annotation (Placement(transformation(extent={{-60,-10},{-40,10}})));
-  Buildings.Fluid.Movers.FlowControlled_m_flow
+    redeclare Buildings.Fluid.Movers.Data.Pumps.Wilo.Stratos25slash1to6 per,
+    inputType=Buildings.Fluid.Types.InputType.Continuous)
+    annotation (Placement(transformation(extent={{-60,-10},{-40,10}})));
+  Buildings.Fluid.Movers.SpeedControlled_Nrpm
                                            pum(redeclare final package Medium =
-        MediumWater,                                                                         addPowerToMedium=false)
+        MediumWater, addPowerToMedium=false)
     annotation (Placement(transformation(extent={{40,-50},{22,-30}})));
   Buildings.Fluid.Sources.Boundary_pT souWat(
     redeclare final package Medium = MediumWater,
-    use_T_in=false,
     nPorts=1) annotation (Placement(transformation(extent={{80,-50},{60,-30}})));
   Buildings.Fluid.Sources.Boundary_pT sinWat(redeclare final package Medium =
         MediumWater,                                                                       nPorts=1)
     annotation (Placement(transformation(extent={{-60,-50},{-40,-30}})));
 
-  ComponentModels.Lumped cooPad(
+  ComponentModels.PhysicsBased
+                         cooPad(
     redeclare package Medium1 = Medium,
     redeclare package Medium2 = MediumWater,
     final m1_flow_nominal=m_flow_nominal,
@@ -85,11 +98,10 @@ model DecSystemPhysicsBased "Model of Direct evaporative cooling system with pum
     final K_value=K_value,
     final Contact_surface_area=Contact_surface_area,
     final DriftFactor=DriftFactor,
-    final Rcon=Rcon) annotation (Placement(transformation(extent={{-20,-16},{0,4}})));
+    final Rcon=Rcon) annotation (Placement(transformation(extent={{-22,-16},{-2,4}})));
 
   Modelica.Blocks.Sources.RealExpression pumPow(y=pum.P) "Power consumed by pump" annotation (Placement(transformation(extent={{60,70},{80,90}})));
-  Modelica.Blocks.Sources.RealExpression fanPow(y=pump.P)
-    "Power consumed by fan/blower"
+  Modelica.Blocks.Sources.RealExpression fanPow(y=fan.P) "Power consumed by fan/blower"
     annotation (Placement(transformation(extent={{60,50},{80,70}})));
   Modelica.Blocks.Interfaces.RealOutput pumP "Power consumed by water pump to wet the cooling pad"
     annotation (Placement(transformation(extent={{100,70},{120,90}}), iconTransformation(extent={{100,70},{120,90}})));
@@ -109,7 +121,8 @@ protected
 
 equation
 
-  connect(port_a, pump.port_a) annotation (Line(
+  connect(port_a, fan.port_a)
+    annotation (Line(
       points={{-100,0},{-60,0}},
       color={0,127,255},
       thickness=0.5));
@@ -117,29 +130,28 @@ equation
       points={{40,-40},{60,-40}},
       color={0,127,255},
       thickness=0.5));
-  connect(pump.port_b, cooPad.port_a1) annotation (Line(
-      points={{-40,0},{-20,0}},
+  connect(fan.port_b, cooPad.port_a1)
+    annotation (Line(
+      points={{-40,0},{-22,0}},
       color={0,127,255},
       thickness=0.5));
   connect(sinWat.ports[1],cooPad. port_b2) annotation (Line(
-      points={{-40,-40},{-26,-40},{-26,-12},{-20,-12}},
+      points={{-40,-40},{-26,-40},{-26,-12},{-22,-12}},
       color={0,127,255},
       thickness=0.5));
   connect(cooPad.port_a2, pum.port_b) annotation (Line(
-      points={{0,-12},{8,-12},{8,-40},{22,-40}},
+      points={{-2,-12},{8,-12},{8,-40},{22,-40}},
       color={0,127,255},
       thickness=0.5));
   connect(cooPad.port_b1, port_b) annotation (Line(
-      points={{0,0},{100,0}},
+      points={{-2,0},{100,0}},
       color={0,127,255},
       thickness=0.5));
   connect(fanP, fanP) annotation (Line(points={{110,60},{110,60}}, color={0,0,127}));
   connect(fanPow.y, fanP) annotation (Line(points={{81,60},{110,60}}, color={0,0,127}));
   connect(pumPow.y, pumP) annotation (Line(points={{81,80},{110,80}}, color={0,0,127}));
-  connect(pumSig, pum.m_flow_in)
-    annotation (Line(points={{-120,80},{31,80},{31,-28}}, color={0,0,127}));
-  connect(fanSig, pump.Nrpm)
-    annotation (Line(points={{-120,30},{-50,30},{-50,12}}, color={0,0,127}));
+  connect(fanSig, fan.Nrpm) annotation (Line(points={{-120,30},{-50,30},{-50,12}}, color={0,0,127}));
+  connect(pumSig, pum.Nrpm) annotation (Line(points={{-120,80},{31,80},{31,-28}}, color={0,0,127}));
   annotation (
     Icon(coordinateSystem(preserveAspectRatio=false), graphics={
         Rectangle(

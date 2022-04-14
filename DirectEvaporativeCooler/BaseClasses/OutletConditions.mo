@@ -69,7 +69,7 @@ p_wat =  (6.11* 10^((7.5*Tdp)/(237.3+Tdp)))*100 "Partial pressure of water vapou
 w_ou=  Buildings.Utilities.Psychrometrics.Functions.X_pW(p_wat);
 
 // Step 5: Determining the sensible heat transered = laten heat transfered in the process of evaporative cooling
-qS = m_a*1.225*(Tdb_in - Tdb_ou) "Sensible heat transfered";
+qS = m_a*1000*(Tdb_in - Tdb_ou) "Sensible heat transfered";
 
   annotation (Icon(coordinateSystem(preserveAspectRatio=false)),defaultComponentName="outCon", Diagram(
         coordinateSystem(preserveAspectRatio=false)));

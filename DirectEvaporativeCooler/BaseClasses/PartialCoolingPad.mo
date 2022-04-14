@@ -3,19 +3,25 @@ partial model PartialCoolingPad
                         "Partial model for implementing various cooling pad with varied degree of details"
 
   extends Buildings.Fluid.Interfaces.PartialFourPortInterface(
-    allowFlowReversal2=false,
+    allowFlowReversal2=true,
     allowFlowReversal1=false,
+    redeclare replaceable package Medium1 =
+        Buildings.Media.Air,
     port_a1(h_outflow(start=h1_outflow_start)),
     port_b1(h_outflow(start=h1_outflow_start)),
     port_a2(h_outflow(start=h2_outflow_start)),
     port_b2(h_outflow(start=h2_outflow_start)));
 
   //Nominal pressure drop
-  parameter Modelica.SIunits.PressureDifference dp_pad_nominal "Pressure drop acrross the cooling pad at nominal mass flow rate on the air side"
+  parameter Modelica.SIunits.PressureDifference dp_pad_nominal= 10000 "Pressure drop acrross the cooling pad at nominal mass flow rate on the air side"
     annotation (Dialog(group="Nominal condition"));
 
-  parameter Modelica.SIunits.PressureDifference dp_pip_nominal "Pressure drop at nominal mass flow rate on the water side"
+  parameter Modelica.SIunits.PressureDifference dp_pip_nominal = 1000 "Pressure drop at nominal mass flow rate on the water side"
     annotation (Dialog(group="Nominal condition"));
+
+  constant Boolean homotopyInitialization = true "= true, use homotopy method"
+    annotation(HideResult=true);
+
 
   ////Cooling pad types
 
@@ -116,6 +122,7 @@ partial model PartialCoolingPad
     redeclare final package Medium = Medium1,
     final m_flow_nominal=m1_flow_nominal,
     final m_flow_small=m1_flow_small,
+    tau=tau1,
     final initType=Modelica.Blocks.Types.Init.NoInit,
     final T_start=T1_start) "Drybulb temperature sensor" annotation (Placement(transformation(extent={{-46,66},{-34,54}})));
   Buildings.Fluid.Sensors.TemperatureWetBulbTwoPort senWetBul(
@@ -123,15 +130,13 @@ partial model PartialCoolingPad
     final allowFlowReversal=allowFlowReversal1,
     final m_flow_nominal=m1_flow_nominal,
     final m_flow_small=m1_flow_small,
+    tau=tau1,
     final initType=Modelica.Blocks.Types.Init.NoInit) "Wetbulb temperature sensor" annotation (Placement(transformation(extent={{-66,66},{-54,54}})));
-  Buildings.Fluid.Sensors.MassFractionTwoPort senMasFra(
-    redeclare final package Medium = Medium1,
+  Buildings.Fluid.Sensors.MassFractionTwoPort senMasFra(redeclare package Medium = Medium1,
     final m_flow_nominal=m1_flow_nominal,
-    final tau=tau1,
-    initType=Modelica.Blocks.Types.Init.InitialState,
-    final substanceName="Air") "Mass fraction sensor (Humidity ratio)" annotation (Placement(transformation(extent={{-6,66},{6,54}})));
+    tau=tau1)                  "Mass fraction sensor (Humidity ratio)" annotation (Placement(transformation(extent={{-6,66},{6,54}})));
   Buildings.Fluid.Sensors.MassFlowRate senMasFloW(redeclare final package Medium = Medium2, final allowFlowReversal=allowFlowReversal2) "Mass flow rate of water"
-    annotation (Placement(transformation(extent={{-46,-66},{-34,-54}})));
+    annotation (Placement(transformation(extent={{0,-66},{-12,-54}})));
   Buildings.Fluid.MixingVolumes.MixingVolume volWat(
     redeclare final package Medium = Medium2,
     final energyDynamics=energyDynamics,
@@ -166,20 +171,23 @@ partial model PartialCoolingPad
     redeclare final package Medium = Medium1,
     final allowFlowReversal=allowFlowReversal1,
     final m_flow_nominal=m1_flow_nominal,
+    dp_nominal=dp_pad_nominal,
     linearized=false) "Pressure drop across the cooling pad, calculated based on the pad characteristics, dimensions and mass flow of air and water. "
     annotation (Placement(transformation(extent={{20,50},{40,70}})));
   Buildings.Fluid.FixedResistances.PressureDrop dpPip(
     redeclare final package Medium = Medium2,
     final allowFlowReversal=allowFlowReversal2,
     final m_flow_nominal=m2_flow_nominal,
-    final dp_nominal=dp_pip_nominal) "Pressure raise to pump the water over the cooling pad" annotation (Placement(transformation(extent={{20,-70},{40,-50}})));
+    final dp_nominal=dp_pip_nominal) "Pressure raise to pump the water over the cooling pad" annotation (Placement(transformation(extent={{60,-70},
+            {40,-50}})));
 
   Buildings.Fluid.Sensors.Velocity senVel(
     redeclare final package Medium = Medium1,
     final allowFlowReversal=allowFlowReversal1,
     final m_flow_nominal=m1_flow_nominal,
     final m_flow_small=m1_flow_small,
-    final initType=Modelica.Blocks.Types.Init.NoInit) "Velocity sensor" annotation (Placement(transformation(extent={{-86,66},{-74,54}})));
+    final initType=Modelica.Blocks.Types.Init.NoInit,
+    A=PadArea)                                        "Velocity sensor" annotation (Placement(transformation(extent={{-86,66},{-74,54}})));
   Modelica.Fluid.Sources.MassFlowSource_T MasFloRem(
     redeclare package Medium = Medium2,
     use_m_flow_in=true,
@@ -188,11 +196,22 @@ partial model PartialCoolingPad
         extent={{6,-6},{-6,6}},
         rotation=0,
         origin={26,-32})));
+
+  Buildings.HeatTransfer.Sources.PrescribedHeatFlow Qs "Sensible heat transfered into water"
+    annotation (Placement(transformation(
+        extent={{-6,6},{6,-6}},
+        rotation=180,
+        origin={26,-86})));
+
+
+
+
 protected
   parameter Medium1.ThermodynamicState sta1_nominal=Medium1.setState_pTX(
       T=Medium1.T_default,
       p=Medium1.p_default,
-      X=Medium1.X_default);
+      X=Medium1.X_default[1:Medium1.nXi]);
+
   parameter Modelica.SIunits.Density rho1_nominal=Medium1.density(sta1_nominal) "Density of medium 1, used to compute fluid volume";
 
   parameter Medium1.ThermodynamicState sta1_start=Medium1.setState_pTX(
@@ -213,11 +232,34 @@ protected
       X=X2_start);
   parameter Modelica.SIunits.SpecificEnthalpy h2_outflow_start=Medium2.specificEnthalpy(sta2_start) "Start value for outflowing enthalpy";
 
-  Buildings.HeatTransfer.Sources.PrescribedHeatFlow Qs "Sensible heat transfered into water"
-    annotation (Placement(transformation(
-        extent={{-6,6},{6,-6}},
-        rotation=180,
-        origin={26,-86})));
+
+
+
+initial equation
+  // Check for tau1
+  assert((energyDynamics == Modelica.Fluid.Types.Dynamics.SteadyState) or
+          tau1 > Modelica.Constants.eps,
+"The parameter tau1, or the volume of the model from which tau may be derived, is unreasonably small.
+ You need to set energyDynamics == Modelica.Fluid.Types.Dynamics.SteadyState to model steady-state.
+ Received tau1 = " + String(tau1) + "\n");
+  assert((massDynamics == Modelica.Fluid.Types.Dynamics.SteadyState) or
+          tau1 > Modelica.Constants.eps,
+"The parameter tau1, or the volume of the model from which tau may be derived, is unreasonably small.
+ You need to set massDynamics == Modelica.Fluid.Types.Dynamics.SteadyState to model steady-state.
+ Received tau1 = " + String(tau1) + "\n");
+
+ // Check for tau2
+  assert((energyDynamics == Modelica.Fluid.Types.Dynamics.SteadyState) or
+          tau2 > Modelica.Constants.eps,
+"The parameter tau2, or the volume of the model from which tau may be derived, is unreasonably small.
+ You need to set energyDynamics == Modelica.Fluid.Types.Dynamics.SteadyState to model steady-state.
+ Received tau2 = " + String(tau2) + "\n");
+  assert((massDynamics == Modelica.Fluid.Types.Dynamics.SteadyState) or
+          tau2 > Modelica.Constants.eps,
+"The parameter tau2, or the volume of the model from which tau may be derived, is unreasonably small.
+ You need to set massDynamics == Modelica.Fluid.Types.Dynamics.SteadyState to model steady-state.
+ Received tau2 = " + String(tau2) + "\n");
+
 equation
 
   connect(dpPad.port_b, volAir.ports[1]) annotation (Line(
@@ -257,21 +299,22 @@ equation
       points={{6,60},{20,60}},
       color={0,127,255},
       thickness=0.5));
-  connect(volWat.ports[2], senMasFloW.port_a) annotation (Line(
-      points={{-70,-60},{-46,-60}},
-      color={0,127,255},
-      thickness=0.5));
-  connect(senMasFloW.port_b, dpPip.port_a) annotation (Line(
-      points={{-34,-60},{20,-60}},
-      color={0,127,255},
-      thickness=0.5));
-  connect(dpPip.port_b, port_a2) annotation (Line(
-      points={{40,-60},{100,-60}},
-      color={0,127,255},
-      thickness=0.5));
-  connect(MasFloRem.ports[1], volWat.ports[3]) annotation (Line(points={{-20,-40},{-72.6667,-40},{-72.6667,-60}}, color={0,127,255}));
+  connect(MasFloRem.ports[1], volWat.ports[2]) annotation (Line(points={{-20,-40},{-70,-40},{-70,-60}},           color={0,127,255}));
   connect(gain.y, MasFloRem.m_flow_in) annotation (Line(points={{19.4,-32},{0,-32}}, color={0,0,127}));
   connect(volWat.heatPort, Qs.port) annotation (Line(points={{-60,-70},{-60,-86},{20,-86}}, color={191,0,0}));
+  connect(dpPip.port_a, port_a2)
+    annotation (Line(
+      points={{60,-60},{100,-60}},
+      color={0,127,255},
+      thickness=0.5));
+  connect(senMasFloW.port_a, dpPip.port_b) annotation (Line(
+      points={{-4.44089e-16,-60},{40,-60}},
+      color={0,127,255},
+      thickness=0.5));
+  connect(senMasFloW.port_b, volWat.ports[3]) annotation (Line(
+      points={{-12,-60},{-72.6667,-60}},
+      color={0,127,255},
+      thickness=0.5));
   annotation (Diagram(graphics={
         Text(
           extent={{74,88},{99,78}},

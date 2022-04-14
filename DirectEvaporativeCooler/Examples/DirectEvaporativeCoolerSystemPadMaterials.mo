@@ -31,7 +31,7 @@ model DirectEvaporativeCoolerSystemPadMaterials
   Buildings.Fluid.Sensors.TemperatureTwoPort senTem(redeclare package Medium = MediumAir, m_flow_nominal=1)
     annotation (Placement(transformation(extent={{30,32},{46,48}})));
   Buildings.Fluid.Sensors.TemperatureWetBulbTwoPort senWetBul(redeclare package
-      Medium =                                                                           MediumAir, m_flow_nominal=1)
+              Medium =                                                                   MediumAir, m_flow_nominal=1)
     annotation (Placement(transformation(extent={{54,32},{70,48}})));
   Buildings.Fluid.FixedResistances.PressureDrop ducRes(
     redeclare package Medium = MediumAir,

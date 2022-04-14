@@ -18,7 +18,20 @@ model DirectEvaporativeCoolerSystem
     m_flow_nominal=1,
     mW_flow_nominal=1,
     dp_pad_nominal=1000000000,
-    dp_pip_nominal=1000000000)  "Direct evaporative cooling system" annotation (Placement(transformation(extent={{-30,30},{-10,50}})));
+    dp_pip_nominal=1000000000,
+    perFan=Records.BreezairIcon210FanCurve(
+        pressure=pressure(V_flow={2.28,2.31,2.34,2.37,2.4,2.44,2.47,2.49,2.51,2.54,2.56,2.59,2.62,2.65,
+          2.69,2.71,2.74,2.77,2.79,2.81,2.84,2.87,2.9,2.93}, dp={215.5,206.5,198.8,191.5,182.9,174.82,
+          167.5,160.16,152.41,143.44,132.42,123.04,112.44,102.67,92.89,82.69,73.32,65.17,55.37,45.18,
+          34.58,24.79,12.96,3.59}),
+        use_powerCharacteristic=true,
+        power=power(V_flow={0.35100689,0.446053887,0.586123145,0.746202297,0.876266608,1.031343286,
+          1.156405124,1.306479329,1.43654364,1.53659311,1.626637633,1.696672261,1.791719258,
+          1.841743993,1.926786042,1.996820671,2.0668553,2.126884982}, P={89.01734104,89.01734104,
+          93.6416185,126.0115607,153.7572254,190.7514451,246.2427746,310.982659,384.9710983,
+          458.9595376,528.3236994,602.3121387,708.6705202,778.0346821,879.7687861,1009.248555,
+          1110.982659,1212.716763})))
+                                "Direct evaporative cooling system" annotation (Placement(transformation(extent={{-30,30},{-10,50}})));
   Buildings.Fluid.Sources.Boundary_pT sou(
     redeclare package Medium = MediumAir,
     use_Xi_in=true,
@@ -31,7 +44,7 @@ model DirectEvaporativeCoolerSystem
   Buildings.Fluid.Sensors.TemperatureTwoPort senTem(redeclare package Medium = MediumAir, m_flow_nominal=1)
     annotation (Placement(transformation(extent={{30,32},{46,48}})));
   Buildings.Fluid.Sensors.TemperatureWetBulbTwoPort senWetBul(redeclare package
-      Medium =                                                                           MediumAir, m_flow_nominal=1)
+              Medium =                                                                   MediumAir, m_flow_nominal=1)
     annotation (Placement(transformation(extent={{54,32},{70,48}})));
   Buildings.Fluid.FixedResistances.PressureDrop ducRes(
     redeclare package Medium = MediumAir,
@@ -78,7 +91,6 @@ model DirectEvaporativeCoolerSystem
   Modelica.Blocks.Math.Add preDroDatErr(k2=-1) "Pressure drop error in the data" annotation (Placement(transformation(extent={{-60,-110},{-40,-90}})));
   Modelica.Blocks.Sources.RealExpression preDrop1(y=decSys.port_a.p - decSys.port_b.p) "Pressure drop"
     annotation (Placement(transformation(extent={{-96,-96},{-80,-80}})));
-  Modelica.Blocks.Sources.TimeTable preDroData annotation (Placement(transformation(extent={{-100,-120},{-80,-100}})));
   Modelica.Blocks.Math.Add effDatErr(k2=-1) "Efficiency error" annotation (Placement(transformation(extent={{80,-62},{100,-42}})));
   Modelica.Blocks.Sources.TimeTable effData(table=[0,91.5; 1,92.3; 2,92.2; 3,
         91.6; 4,84.1; 5,92.5; 6,88.5; 7,87.6; 8,88.7; 9,89.9; 10,88.5; 11,86;
@@ -100,23 +112,13 @@ model DirectEvaporativeCoolerSystem
         0.0071536; 43,0.0151488; 44,0.0117824; 45,0.0187256; 46,0.0160956; 47,0])
                                                annotation (Placement(transformation(extent={{40,-134},{60,-114}})));
   Modelica.Blocks.Math.Add watConDatErr(k2=-1) "Water consumption error in the data" annotation (Placement(transformation(extent={{80,-122},{100,-102}})));
-  Buildings.Fluid.Sensors.RelativeHumidity phiIn "Inlet relative humidity"
-    annotation (Placement(transformation(
-        extent={{-6,6},{6,-6}},
-        rotation=0,
-        origin={-30,14})));
-  Buildings.Fluid.Sensors.RelativeHumidity phiOu "Outlet relative humidity"
-    annotation (Placement(transformation(
-        extent={{-6,6},{6,-6}},
-        rotation=0,
-        origin={-10,14})));
 equation
   connect(sou.ports[1], decSys.port_a) annotation (Line(
-      points={{-46,40},{-30,40}},
+      points={{-46,40},{-38,40},{-38,40},{-30,40}},
       color={0,127,255},
       thickness=0.5));
   connect(sin.ports[1], senWetBul.port_b) annotation (Line(
-      points={{80,40},{70,40}},
+      points={{80,40},{76,40},{76,40},{70,40}},
       color={0,127,255},
       thickness=0.5));
   connect(senWetBul.port_a, senTem.port_b) annotation (Line(
@@ -150,13 +152,12 @@ equation
   connect(preDrop.y, preDroModErr.u1) annotation (Line(points={{-79.2,-40},{-68,-40},{-68,-44},{-62,-44}}, color={0,0,127}));
   connect(preDropCal.y, preDroModErr.u2) annotation (Line(points={{-79.2,-60},{-70,-60},{-70,-56},{-62,-56}}, color={0,0,127}));
   connect(preDroDatErr.u1, preDrop1.y) annotation (Line(points={{-62,-94},{-70,-94},{-70,-88},{-79.2,-88}}, color={0,0,127}));
-  connect(preDroData.y, preDroDatErr.u2) annotation (Line(points={{-79,-110},{-70,-110},{-70,-106},{-62,-106}}, color={0,0,127}));
   connect(effDatErr.u1, Efficiency.y) annotation (Line(points={{78,-46},{68,-46},{68,-42},{60.8,-42}}, color={0,0,127}));
   connect(effData.y, effDatErr.u2) annotation (Line(points={{61,-62},{70,-62},{70,-58},{78,-58}}, color={0,0,127}));
   connect(watCon.y, watConDatErr.u1) annotation (Line(points={{60.8,-100},{72,-100},{72,-106},{78,-106}}, color={0,0,127}));
   connect(watConData.y, watConDatErr.u2) annotation (Line(points={{61,-124},{70,-124},{70,-118},{78,-118}}, color={0,0,127}));
-  connect(decSys.port_a, phiIn.port) annotation (Line(points={{-30,40},{-30,20}}, color={0,127,255}));
-  connect(decSys.port_b, phiOu.port) annotation (Line(points={{-10,40},{-10,20}}, color={0,127,255}));
+  connect(watConData.y, preDroDatErr.u2) annotation (Line(points={{61,-124},{66,-124},{66,-140},{-68,
+          -140},{-68,-106},{-62,-106}}, color={0,0,127}));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},{100,100}})), Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-120,-140},
             {120,100}})));
 end DirectEvaporativeCoolerSystem;

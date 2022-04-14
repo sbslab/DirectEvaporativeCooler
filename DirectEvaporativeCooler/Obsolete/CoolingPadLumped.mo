@@ -93,8 +93,7 @@ model CoolingPadLumped "The DEC lumped model is implemented  based on the equati
 
   replaceable
     Buildings.Fluid.MixingVolumes.BaseClasses.MixingVolumeHeatPort VolWat(nPorts=3)
-    constrainedby
-    Buildings.Fluid.MixingVolumes.BaseClasses.MixingVolumeHeatPort(
+    constrainedby Buildings.Fluid.MixingVolumes.BaseClasses.MixingVolumeHeatPort(
     redeclare final package Medium = Medium1,
     nPorts=2,
     V=m1_flow_nominal*tau1/rho1_nominal,
@@ -113,8 +112,7 @@ model CoolingPadLumped "The DEC lumped model is implemented  based on the equati
     annotation (Placement(transformation(extent={{-54,-60},{-74,-80}})));
 
   replaceable Buildings.Fluid.MixingVolumes.MixingVolumeMoistAir VolAir(nPorts=2)
-    constrainedby
-    Buildings.Fluid.MixingVolumes.BaseClasses.MixingVolumeHeatPort(
+    constrainedby Buildings.Fluid.MixingVolumes.BaseClasses.MixingVolumeHeatPort(
     redeclare final package Medium = Medium2,
     nPorts=2,
     V=m2_flow_nominal*tau2/rho2_nominal,
@@ -278,8 +276,8 @@ equation
   connect(MasFlo.m_flow_in, gain.y) annotation (Line(points={{-16,-39.4},{
           55,-39.4},{55,-33.3}},          color={0,0,127},
       pattern=LinePattern.Dash));
-  connect(MasFlo.ports[1], VolWat.ports[3]) annotation (Line(points={{-30,-45},{-64,-45},{-64,-60},{-66.6667,-60}},
-                                                    color={50,172,248},
+  connect(MasFlo.ports[1], VolWat.ports[3]) annotation (Line(points={{-30,-45},{-64,-45},{-64,-60},{
+          -66.6667,-60}},                           color={50,172,248},
       thickness=0.5));
   connect(VolumeFlowRate2MassFlowRate.y, gain.u) annotation (Line(points={{55,
           -20.5},{55,-26.4}},                      color={0,0,127},

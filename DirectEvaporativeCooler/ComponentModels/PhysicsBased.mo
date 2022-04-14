@@ -15,11 +15,11 @@ model PhysicsBased "Model for the Physics-based evaporative cooling pad"
     final CooPadMaterial=CooPadMaterial,
     final p_atm=p_atm,
     final k=K_value)                annotation (Placement(transformation(extent={{-44,0},{-24,20}})));
-  BaseClasses.HeatTransfer HeaTraPhy                 annotation (Placement(transformation(extent={{20,20},{40,40}})));
+  BaseClasses.HeatTransfer HeaTraPhy(A=PadArea)      annotation (Placement(transformation(extent={{20,20},{40,40}})));
 equation
 
   // pressure drop module
-  v_a = (m1_flow/rho2_nominal)/PadArea;
+  v_a = (m1_flow/rho1_nominal)/PadArea;
   dp_pad_cal = 0.768*((0.0288)^(-0.469))*(1 + (m2_flow_nominal^1.139))*(v_a^2);
 
   connect(volWat.heatPort, Qs.port) annotation (Line(points={{-60,-70},{-60,-86},{20,-86}}, color={191,0,0}));

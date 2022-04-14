@@ -12,14 +12,15 @@ Modelica.SIunits.PressureDifference dpW_nominal = 10000 "Nominal pressure drop o
 Modelica.SIunits.PressureDifference dpA_nominal = 10000  "Nominal pressure drop on the air side";
 Modelica.SIunits.PressureDifference dpD_nominal = 10000 "Nominal pressure drop across the duct";
 
-  ComponentModels.PhysicsBased cooPad(redeclare package Medium1 = MediumAir, redeclare
-      package                                                                                  Medium2 =
+  ComponentModels.PhysicsBased cooPad(redeclare package Medium1 = MediumAir, redeclare package
+              Medium2 =
         MediumWater)                  annotation (Placement(transformation(extent={{-40,-16},{-20,4}})));
   Buildings.Fluid.HeatExchangers.SensibleCooler_T coo(redeclare package Medium = MediumAir)
                                                       annotation (Placement(transformation(extent={{40,-10},{60,10}})));
   Buildings.Fluid.Movers.SpeedControlled_y fan(redeclare package Medium = MediumAir)
                                                annotation (Placement(transformation(extent={{-90,-10},{-70,10}})));
-  Buildings.Fluid.Sensors.RelativeHumidityTwoPort senRelHum(redeclare package Medium = MediumAir)
+  Buildings.Fluid.Sensors.RelativeHumidityTwoPort senRelHum(redeclare package
+      Medium =                                                                         MediumAir)
                                                             annotation (Placement(transformation(extent={{8,-6},{20,6}})));
   Buildings.Fluid.Sensors.TemperatureTwoPort senTem(redeclare package Medium = MediumAir)
                                                     annotation (Placement(transformation(extent={{-12,-6},{0,6}})));
@@ -42,7 +43,8 @@ Modelica.SIunits.PressureDifference dpD_nominal = 10000 "Nominal pressure drop a
   Buildings.Fluid.Movers.SpeedControlled_y pum(redeclare package Medium =
         MediumWater,                                                                   addPowerToMedium=false)
     annotation (Placement(transformation(extent={{18,-30},{0,-50}})));
-  Buildings.Fluid.Sensors.RelativeHumidityTwoPort senRelHum1(redeclare package Medium = MediumAir)
+  Buildings.Fluid.Sensors.RelativeHumidityTwoPort senRelHum1(redeclare package
+      Medium =                                                                          MediumAir)
                                                              annotation (Placement(transformation(extent={{-60,-6},{-48,6}})));
   Modelica.Blocks.Sources.Constant Tset annotation (Placement(transformation(extent={{0,30},{20,50}})));
   Modelica.Blocks.Sources.Constant fanSig annotation (Placement(transformation(extent={{-120,30},{-100,50}})));
