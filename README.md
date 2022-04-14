@@ -9,11 +9,16 @@ AHU. The CoolingPadLumped model is based on the well known EnergyPlus Cel_Dek co
 The physics-based model that is developed using the heat and mass transfer equations.
 
 DirectEvaportiveCooler
-   - CoolingPadLumped
-   - CoolingPadPhysicsBased
-   - BaseClasses
-        - PartialCoolingPad
-        - PartialDECSys
+   - ComponentModels
+      - CoolingPadLumped
+      - CoolingPadPhysicsBased
+   - SystemModel
+      - DecSsLumped
+      - DecSysPhysicsBased
    - Examples
-        - DECSys
-        - DECPreCooling
+        - DirectEvaporativeCoolerSystem
+        - DirectEvaporativeCoolerSystemPadMaterials
+        - DirectEvaporativeCoolerPreCooling
+        - DirectEvaporativeCoolerPressuredropValidation
+   - BaseClasses
+   - Records
