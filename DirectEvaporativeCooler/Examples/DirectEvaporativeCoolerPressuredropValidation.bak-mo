@@ -74,16 +74,6 @@ Modelica.SIunits.PressureDifference dpD_nominal = 10000 "Nominal pressure drop a
         0.012908; 45,0.006547; 46,0.010604; 47,0], timeScale=900)
                                    "Inlet humidity ratio" annotation (Placement(transformation(extent={{-112,
             -26},{-100,-14}})));
-  Buildings.Fluid.Sensors.RelativeHumidity phiIn "Inlet relative humidity"
-    annotation (Placement(transformation(
-        extent={{-6,6},{6,-6}},
-        rotation=0,
-        origin={-50,-26})));
-  Buildings.Fluid.Sensors.RelativeHumidity phiOu "Outlet relative humidity"
-    annotation (Placement(transformation(
-        extent={{-6,6},{6,-6}},
-        rotation=0,
-        origin={-30,-26})));
 equation
   connect(sou.ports[1],decSys. port_a) annotation (Line(
       points={{-66,0},{-50,0}},
@@ -121,8 +111,6 @@ equation
       points={{-99.4,-20},{-94,-20},{-94,-4},{-88,-4}},
       color={0,0,127},
       pattern=LinePattern.Dash));
-  connect(decSys.port_a,phiIn. port) annotation (Line(points={{-50,0},{-50,-20}}, color={0,127,255}));
-  connect(decSys.port_b,phiOu. port) annotation (Line(points={{-30,0},{-30,-20}}, color={0,127,255}));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
         coordinateSystem(preserveAspectRatio=false, extent={{-160,-100},{120,100}})));
 end DirectEvaporativeCoolerPressuredropValidation;

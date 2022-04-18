@@ -20,7 +20,7 @@ block CoolingPadEfficiencyPhysicsBased
   Modelica.SIunits.SpecificHeatCapacity Cpa = 1000 " Specific heat of air J/kg K";
   Modelica.SIunits.Density rho " Air density, kg/m3";
   Modelica.SIunits.Length le = (V/ TSA) "Characteristic length ,m";
-  Modelica.SIunits.ThermalConductivity ka = 0.02706 "Thermal conductivity of air, W/mK";
+  Modelica.SIunits.ThermalConductivity ka = 0.027223 "Thermal conductivity of air, W/mK";
   Real Nu " Nusselt number";
   Real Re " Reynolds number";
   Real Pr " Prandtl number";
@@ -81,13 +81,15 @@ equation
 //Step 1: Calculating Re and Pr to calculate Nusselts number
 
 rho = p_atm/(287.08*(Twb_in))    " Density of air at the wetbulb temperature";
-Re = Modelica.Fluid.Pipes.BaseClasses.CharacteristicNumbers.ReynoldsNumber(v_a,rho,Mu,d)
- "Renyolds number";
-Pr = Modelica.Fluid.Dissipation.Utilities.Functions.General.PrandtlNumber(Cpa,Mu,ka)
- "Prandtl number";
+Re = (rho* v_a * d)/ Mu "Renyolds number";
+
+//Modelica.Fluid.Pipes.BaseClasses.CharacteristicNumbers.ReynoldsNumber(v_a, rho, Mu, d)
+//Modelica.Fluid.Dissipation.Utilities.Functions.General.PrandtlNumber(Cpa,Mu,ka)
+
+Pr = (Cpa * Mu)/ka "Prandtl number";
 
 // Step 2: Nusselts number varies for different cooling pad media
-Nu = if CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Cellulose then (0.1*((le/d)^(0.12))*(Re^0.8)*(Pr^0.33))
+Nu = if CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Cellulose then (0.10*((le/d)^(0.12))*(Re^0.8)*(Pr^0.33))
   elseif CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.GlassFiber then (0.11*((le/d)^(0.12))*(Re^0.8)*(Pr^0.33))
   elseif CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Paper then (0.07*((le/d)^(0.12))*(Re^0.8) * (Pr^0.33))
   elseif CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Coir then 0.13*((le/d)^(0.12))*(Re^0.9) * (Pr^0.33)
@@ -116,10 +118,9 @@ e = ew - (0.00066*(1 + 0.00115*Twb_ouC)*(Tdb_ouC - Twb_ouC)*(p_atm/100))
 "Actual Vapor Pressure (mb)";
 phi = 100*(e/ed)  "Relative humidity";
 B = log(e/6.108)/17.27;
-Tdp = (237.3*B)/(1 - B) "Dew point temperature";
-p_wat = Buildings.Utilities.Psychrometrics.Functions.pW_TDewPoi(Tdp) "Using the function to calculate partial pressure of water vapour from Dew point temperature";
-w_ou = Buildings.Utilities.Psychrometrics.Functions.X_pW(p_wat)  "Humidity ratio for the given water pressure";
-
+Tdp =  (237.3*B)/(1-B) "Dew point temperature of the outlet air";
+p_wat =  (6.11* 10^((7.5*Tdp)/(237.3+Tdp)))*100 "Partial pressure of water vapour of the outlet air";
+w_ou=  Buildings.Utilities.Psychrometrics.Functions.X_pW(p_wat);
   annotation (Icon(coordinateSystem(preserveAspectRatio=false)),defaultComponentName="effPhy", Diagram(
         coordinateSystem(preserveAspectRatio=false)));
 end CoolingPadEfficiencyPhysicsBased;

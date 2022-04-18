@@ -37,16 +37,14 @@ equation
       points={{-10.6,-2},{-2,-2},{-2,-16},{60,-16},{60,-86},{32,-86}},
       color={238,46,47},
       pattern=LinePattern.Dash));
-  connect(watCon.V_tot, gain.u) annotation (Line(
-      points={{35.4,8},{40,8},{40,-32},{33.2,-32}},
-      color={0,0,127},
+  connect(senMasFra.X, watCon.w_in) annotation (Line(points={{0,53.4},{0,18},{12,18}}, color={0,0,127},
       pattern=LinePattern.Dash));
-  connect(watCon.V_eva, volAir.mWat_flow) annotation (Line(
-      points={{35.4,16},{40,16},{40,42},{58,42}},
-      color={0,0,127},
+  connect(senMasFlo.m_flow, watCon.m_a) annotation (Line(points={{-20,53.4},{-20,12},{12,12}}, color={0,0,127},
       pattern=LinePattern.Dash));
-  connect(senMasFra.X, watCon.w_in) annotation (Line(points={{0,53.4},{0,18},{12,18}}, color={0,0,127}));
-  connect(senMasFlo.m_flow, watCon.m_a) annotation (Line(points={{-20,53.4},{-20,12},{12,12}}, color={0,0,127}));
-  connect(senVel.v, effPhy.v_a) annotation (Line(points={{-80,53.4},{-80,-20},{-78,-20}}, color={0,0,127}));
+  connect(senVel.v, effPhy.v_a) annotation (Line(points={{-80,53.4},{-80,-20},{-78,-20}}, color={0,0,127},
+      pattern=LinePattern.Dash));
+  connect(watCon.m_eva, volAir.mWat_flow)
+    annotation (Line(points={{35.4,16},{52,16},{52,42},{58,42}}, color={0,0,127}));
+  connect(watCon.m_tot, gain.u) annotation (Line(points={{35.4,8},{40,8},{40,-32},{33.2,-32}}, color={0,0,127}));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false)),defaultComponentName="cooPad", Diagram(coordinateSystem(preserveAspectRatio=false)));
 end Lumped;

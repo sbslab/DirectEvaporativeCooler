@@ -22,7 +22,7 @@ model DecSystemPhysicsBased "Model of Direct evaporative cooling system with pum
   parameter BaseClasses.CooPadMaterial CooPadMaterial=DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Cellulose
     "Various types of cooling pad materials/media such as Cellulose, Glass fiber, Paper, Coir, Aspen" annotation (Dialog(group="Cooling pad parameters"));
 
-  parameter Real Contact_surface_area=if CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Cellulose then 440 elseif CooPadMaterial ==
+  parameter Real Contact_surface_area=if CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Cellulose then 400 elseif CooPadMaterial ==
       DirectEvaporativeCooler.BaseClasses.CooPadMaterial.GlassFiber then 520 elseif CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Paper then 380
        elseif CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Coir then 209 else 299 "Surface area per unit volume in comact with air(m2/m3)"
     annotation (Dialog(group="Cooling pad parameters"));
@@ -46,14 +46,10 @@ model DecSystemPhysicsBased "Model of Direct evaporative cooling system with pum
     annotation (Dialog(tab="Initialization", enable=Medium.nC > 0));
 
 replaceable parameter Buildings.Fluid.Movers.Data.Generic perFan
-    constrainedby Buildings.Fluid.Movers.Data.Generic
     "Record with performance data for the fan";
 
 
-parameter Buildings.Fluid.Movers.Data.Generic perPum(
-   pressure(
-     V_flow=mW_flow_nominal*1000*{0,1,2},
-     dp=dp_pip_nominal*{2,1,0}))
+replaceable parameter Buildings.Fluid.Movers.Data.Generic perPum
     "Performance data for water pumps within the evaporative cooler";
 
 
@@ -66,14 +62,17 @@ parameter Buildings.Fluid.Movers.Data.Generic perPum(
 
   Buildings.Fluid.Movers.SpeedControlled_Nrpm fan(
     redeclare final package Medium = Medium,
+    per=perFan,
     addPowerToMedium=true,
     y_start=1,
-    redeclare Buildings.Fluid.Movers.Data.Pumps.Wilo.Stratos25slash1to6 per,
     inputType=Buildings.Fluid.Types.InputType.Continuous)
     annotation (Placement(transformation(extent={{-60,-10},{-40,10}})));
-  Buildings.Fluid.Movers.SpeedControlled_Nrpm
+  Buildings.Fluid.Movers.FlowControlled_m_flow
                                            pum(redeclare final package Medium =
-        MediumWater, addPowerToMedium=false)
+        MediumWater,
+    m_flow_nominal=mW_flow_nominal,
+    per=perPum,
+    dp_nominal=dp_pip_nominal)
     annotation (Placement(transformation(extent={{40,-50},{22,-30}})));
   Buildings.Fluid.Sources.Boundary_pT souWat(
     redeclare final package Medium = MediumWater,
@@ -98,7 +97,7 @@ parameter Buildings.Fluid.Movers.Data.Generic perPum(
     final K_value=K_value,
     final Contact_surface_area=Contact_surface_area,
     final DriftFactor=DriftFactor,
-    final Rcon=Rcon) annotation (Placement(transformation(extent={{-22,-16},{-2,4}})));
+    final Rcon=Rcon) annotation (Placement(transformation(extent={{-20,-16},{0,4}})));
 
   Modelica.Blocks.Sources.RealExpression pumPow(y=pum.P) "Power consumed by pump" annotation (Placement(transformation(extent={{60,70},{80,90}})));
   Modelica.Blocks.Sources.RealExpression fanPow(y=fan.P) "Power consumed by fan/blower"
@@ -132,26 +131,26 @@ equation
       thickness=0.5));
   connect(fan.port_b, cooPad.port_a1)
     annotation (Line(
-      points={{-40,0},{-22,0}},
+      points={{-40,0},{-20,0}},
       color={0,127,255},
       thickness=0.5));
   connect(sinWat.ports[1],cooPad. port_b2) annotation (Line(
-      points={{-40,-40},{-26,-40},{-26,-12},{-22,-12}},
+      points={{-40,-40},{-26,-40},{-26,-12},{-20,-12}},
       color={0,127,255},
       thickness=0.5));
   connect(cooPad.port_a2, pum.port_b) annotation (Line(
-      points={{-2,-12},{8,-12},{8,-40},{22,-40}},
+      points={{0,-12},{8,-12},{8,-40},{22,-40}},
       color={0,127,255},
       thickness=0.5));
   connect(cooPad.port_b1, port_b) annotation (Line(
-      points={{-2,0},{100,0}},
+      points={{0,0},{100,0}},
       color={0,127,255},
       thickness=0.5));
   connect(fanP, fanP) annotation (Line(points={{110,60},{110,60}}, color={0,0,127}));
   connect(fanPow.y, fanP) annotation (Line(points={{81,60},{110,60}}, color={0,0,127}));
   connect(pumPow.y, pumP) annotation (Line(points={{81,80},{110,80}}, color={0,0,127}));
   connect(fanSig, fan.Nrpm) annotation (Line(points={{-120,30},{-50,30},{-50,12}}, color={0,0,127}));
-  connect(pumSig, pum.Nrpm) annotation (Line(points={{-120,80},{31,80},{31,-28}}, color={0,0,127}));
+  connect(pumSig, pum.m_flow_in) annotation (Line(points={{-120,80},{31,80},{31,-28}}, color={0,0,127}));
   annotation (
     Icon(coordinateSystem(preserveAspectRatio=false), graphics={
         Rectangle(

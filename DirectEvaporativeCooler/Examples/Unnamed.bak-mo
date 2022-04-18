@@ -1,0 +1,32 @@
+within DirectEvaporativeCooler.Examples;
+model Unnamed
+  Buildings.Fluid.Movers.SpeedControlled_Nrpm fan(
+    redeclare package Medium = Buildings.Media.Air,
+    per(
+      pressure(V_flow={1.965208961,2.005253355,2.047117949,2.094443141,2.133577435,2.160880431,2.211846023,
+            2.272822714,2.314687307,2.375663998,2.416618491,2.467584083,2.515819376,2.55040317}, dp={164,156,147,137,
+            129,118,111,96,84,69,52,37,23,12}),
+      use_powerCharacteristic=true,
+      power(V_flow={0.350919689,0.457351137,0.561653956,0.65744226,0.783031368,0.955450314,1.123612002,1.296030948,
+            1.442906347,1.557852311,1.696213193,1.789872868,1.906947461,2.01125028,2.068723262,2.121938986}, P={
+            86.85211167,97.09530491,91.55178023,103.729234,133.76492,175.80268,229.6595091,311.1450009,382.6770573,
+            477.7633746,606.4641412,717.2532992,863.629293,1007.987149,1120.619065,1209.567092}),
+      speed_rpm_nominal=530,
+      speeds_rpm={530,440,350,260,170}),
+    y_start=1,
+    addPowerToMedium=true) annotation (Placement(transformation(extent={{-40,10},{-20,30}})));
+  Buildings.Fluid.Sources.Boundary_pT sou(
+    redeclare package Medium = Buildings.Media.Air,
+    use_Xi_in=false,
+    use_T_in=false,
+    nPorts=1) annotation (Placement(transformation(extent={{-80,10},{-60,30}})));
+  Buildings.Fluid.Sources.Boundary_pT sin1(redeclare package Medium = Buildings.Media.Air, nPorts=1)
+              annotation (Placement(transformation(extent={{20,10},{0,30}})));
+  Modelica.Blocks.Sources.Step pumSig(height=170)
+                                      "Pump signal" annotation (Placement(transformation(extent={{-92,42},{-80,54}})));
+equation
+  connect(sou.ports[1], fan.port_a) annotation (Line(points={{-60,20},{-40,20}}, color={0,127,255}));
+  connect(fan.port_b, sin1.ports[1]) annotation (Line(points={{-20,20},{0,20}}, color={0,127,255}));
+  connect(pumSig.y, fan.Nrpm) annotation (Line(points={{-79.4,48},{-30,48},{-30,32}}, color={0,0,127}));
+  annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(coordinateSystem(preserveAspectRatio=false)));
+end Unnamed;

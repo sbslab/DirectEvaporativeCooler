@@ -20,7 +20,7 @@ package BlocksValidation
       xi=440,
       CooPadMaterial=DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Cellulose)
       annotation (Placement(transformation(extent={{-20,-6},{0,14}})));
-    Modelica.Blocks.Sources.Constant v_a(k=0.201451) "Velocity"
+    Modelica.Blocks.Sources.Constant v_a(k=0.401451) "Velocity"
       annotation (Placement(transformation(extent={{-60,-20},{-40,0}})));
     Modelica.Blocks.Sources.Constant Twb(k=291.48) "WetBulb"
       annotation (Placement(transformation(extent={{-60,20},{-40,40}})));

@@ -171,7 +171,6 @@ partial model PartialCoolingPad
     redeclare final package Medium = Medium1,
     final allowFlowReversal=allowFlowReversal1,
     final m_flow_nominal=m1_flow_nominal,
-    dp_nominal=dp_pad_nominal,
     linearized=false) "Pressure drop across the cooling pad, calculated based on the pad characteristics, dimensions and mass flow of air and water. "
     annotation (Placement(transformation(extent={{20,50},{40,70}})));
   Buildings.Fluid.FixedResistances.PressureDrop dpPip(

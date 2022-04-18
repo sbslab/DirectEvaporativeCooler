@@ -45,10 +45,7 @@ replaceable parameter Buildings.Fluid.Movers.Data.Generic perFan
     "Record with performance data for the fan";
 
 
-parameter Buildings.Fluid.Movers.Data.Generic perPum(
-   pressure(
-     V_flow=mW_flow_nominal*1000*{0,1,2},
-     dp=dp_pip_nominal*{2,1,0}))
+replaceable parameter Buildings.Fluid.Movers.Data.Generic perPum constrainedby Buildings.Fluid.Movers.Data.Generic
     "Performance data for water pumps within the evaporative cooler";
 
 
@@ -58,17 +55,18 @@ parameter Buildings.Fluid.Movers.Data.Generic perPum(
   Modelica.Blocks.Interfaces.RealInput fanSig "Fan signal"
     annotation (Placement(transformation(extent={{-140,10},{-100,50}}), iconTransformation(extent={{-140,10},{-100,50}})));
 
-  Buildings.Fluid.Movers.SpeedControlled_Nrpm
-                                           pump(
+  Buildings.Fluid.Movers.SpeedControlled_Nrpm fan(
     redeclare package Medium = Medium,
     y_start=1,
     per=perFan,
     inputType=Buildings.Fluid.Types.InputType.Continuous,
-    addPowerToMedium=true)  annotation (Placement(transformation(extent={{-60,-10},{-40,10}})));
-  Buildings.Fluid.Movers.SpeedControlled_Nrpm
+    addPowerToMedium=true) annotation (Placement(transformation(extent={{-60,-10},{-40,10}})));
+  Buildings.Fluid.Movers.FlowControlled_m_flow
                                            pum(redeclare package Medium =
         MediumWater,
-    per=perPum,                                                                        addPowerToMedium=false)
+    m_flow_nominal=mW_flow_nominal,
+    per=perPum,
+    dp_nominal=dp_pip_nominal)
     annotation (Placement(transformation(extent={{40,-50},{22,-30}})));
   Buildings.Fluid.Sources.Boundary_pT souWat(
     redeclare package Medium = MediumWater,
@@ -104,8 +102,7 @@ parameter Buildings.Fluid.Movers.Data.Generic perPum(
   Modelica.Blocks.Interfaces.RealOutput fanP "Power consumed by fan to blow the air through the cooling pad"
     annotation (Placement(transformation(extent={{100,50},{120,70}}), iconTransformation(extent={{100,50},{120,70}})));
   Modelica.Blocks.Sources.RealExpression pumPow(y=pum.P) "Power consumed by pump" annotation (Placement(transformation(extent={{60,70},{80,90}})));
-  Modelica.Blocks.Sources.RealExpression fanPow(y=pump.P)
-    "Power consumed by fan/blower"
+  Modelica.Blocks.Sources.RealExpression fanPow(y=fan.P) "Power consumed by fan/blower"
     annotation (Placement(transformation(extent={{60,50},{80,70}})));
 protected
   parameter Medium.ThermodynamicState sta_default=Medium.setState_pTX(
@@ -121,7 +118,8 @@ protected
 
 equation
 
-  connect(port_a, pump.port_a) annotation (Line(
+  connect(port_a, fan.port_a)
+    annotation (Line(
       points={{-100,0},{-60,0}},
       color={0,127,255},
       thickness=0.5));
@@ -129,7 +127,8 @@ equation
       points={{40,-40},{60,-40}},
       color={0,127,255},
       thickness=0.5));
-  connect(pump.port_b, cooPad.port_a1) annotation (Line(
+  connect(fan.port_b, cooPad.port_a1)
+    annotation (Line(
       points={{-40,0},{-20,0}},
       color={0,127,255},
       thickness=0.5));
@@ -148,9 +147,8 @@ equation
   connect(fanP, fanP) annotation (Line(points={{110,60},{110,60}}, color={0,0,127}));
   connect(fanPow.y, fanP) annotation (Line(points={{81,60},{110,60}}, color={0,0,127}));
   connect(pumPow.y, pumP) annotation (Line(points={{81,80},{110,80}}, color={0,0,127}));
-  connect(fanSig, pump.Nrpm)
-    annotation (Line(points={{-120,30},{-50,30},{-50,12}}, color={0,0,127}));
-  connect(pumSig, pum.Nrpm) annotation (Line(points={{-120,80},{31,80},{31,-28}}, color={0,0,127}));
+  connect(fanSig, fan.Nrpm) annotation (Line(points={{-120,30},{-50,30},{-50,12}}, color={0,0,127}));
+  connect(pumSig, pum.m_flow_in) annotation (Line(points={{-120,80},{31,80},{31,-28}}, color={0,0,127}));
   annotation (
     Icon(coordinateSystem(preserveAspectRatio=false), graphics={
         Rectangle(

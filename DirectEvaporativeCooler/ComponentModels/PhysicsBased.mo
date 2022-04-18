@@ -1,11 +1,12 @@
 within DirectEvaporativeCooler.ComponentModels;
 model PhysicsBased "Model for the Physics-based evaporative cooling pad"
 
-  extends DirectEvaporativeCooler.BaseClasses.PartialCoolingPad(dpPad(dp=dp_pad_cal, dp_nominal=dp_pad_nominal));
+  extends DirectEvaporativeCooler.BaseClasses.PartialCoolingPad(
+      senMasFra(initType=Modelica.Blocks.Types.Init.InitialState), dpPad(dp_nominal=dp_pad_nominal));
 
   BaseClasses.WaterConsumption WatCon(final f_drift=DriftFactor, final rCon=Rcon) annotation (Placement(transformation(extent={{20,-20},{40,0}})));
-  Modelica.SIunits.Velocity v_a "Velocity of the air (m/s)";
-  Modelica.SIunits.Pressure dp_pad_cal "Velocity of the air (m/s)";
+  Modelica.SIunits.Velocity v_a "Nominal velocity of the air (m/s) at nominal flow rate";
+  Modelica.SIunits.PressureDifference dp_pad_cal( displayUnit="Pa") "Velocity of the air (m/s)";
 
   BaseClasses.CoolingPadEfficiencyPhysicsBased Eff_Phy(
     final d=Thickness,
@@ -17,10 +18,14 @@ model PhysicsBased "Model for the Physics-based evaporative cooling pad"
     final k=K_value)                annotation (Placement(transformation(extent={{-44,0},{-24,20}})));
   BaseClasses.HeatTransfer HeaTraPhy(A=PadArea)      annotation (Placement(transformation(extent={{20,20},{40,40}})));
 equation
-
+//dp=dp_pad_cal
   // pressure drop module
-  v_a = (m1_flow/rho1_nominal)/PadArea;
-  dp_pad_cal = 0.768*((0.0288)^(-0.469))*(1 + (m2_flow_nominal^1.139))*(v_a^2);
+  v_a = (m1_flow*Eff_Phy.rho)/PadArea;
+  dp_pad_cal = 0.768*(((1/Contact_surface_area)/Thickness)^(-0.469))*(1 + (m2_flow_nominal^1.139))*(senVel.v^2);
+
+   // v_a_nominal = (m1_flow_nominal*1.225)/PadArea;
+   // dp_pad_cal = 5.5*(((1/Contact_surface_area)/Thickness)^(-0.469))*(1 + (m2_flow_nominal^1.139))*(v_a_nominal^2);
+
 
   connect(volWat.heatPort, Qs.port) annotation (Line(points={{-60,-70},{-60,-86},{20,-86}}, color={191,0,0}));
   connect(HeaTraPhy.Q_sensible, Qs.Q_flow)
@@ -67,10 +72,6 @@ equation
       points={{-80,53.4},{-80,6},{-46,6}},
       color={0,0,127},
       pattern=LinePattern.Dash));
-  connect(WatCon.V_tot, gain.u) annotation (Line(
-      points={{41.4,-14},{52,-14},{52,-32},{33.2,-32}},
-      color={0,0,127},
-      pattern=LinePattern.Dash));
   connect(senMasFra.X, WatCon.w_in) annotation (Line(
       points={{0,53.4},{0,-4},{18,-4}},
       color={0,0,127},
@@ -83,6 +84,10 @@ equation
       points={{-23,8},{-22,8},{-22,-16},{18,-16}},
       color={0,0,127},
       pattern=LinePattern.Dash));
-  connect(WatCon.V_eva, volAir.mWat_flow) annotation (Line(points={{41.4,-6},{52,-6},{52,42},{58,42}}, color={0,0,127}));
+
+  connect(WatCon.m_tot, gain.u)
+    annotation (Line(points={{41.4,-14},{48,-14},{48,-32},{33.2,-32}}, color={0,0,127}));
+  connect(WatCon.m_eva, volAir.mWat_flow)
+    annotation (Line(points={{41.4,-6},{62,-6},{62,36},{58,36},{58,42}}, color={0,0,127}));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false)),defaultComponentName="cooPad", Diagram(coordinateSystem(preserveAspectRatio=false)));
 end PhysicsBased;
