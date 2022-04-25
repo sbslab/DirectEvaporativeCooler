@@ -19,5 +19,3 @@ DirectEvaportiveCooler
    - Examples
    - BaseClasses
    - Records
-=======
->>>>>>> 3ecfc1e7215a0c1a505dbb16d7d65e6c097ef124
