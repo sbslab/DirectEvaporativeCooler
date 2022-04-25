@@ -16,7 +16,5 @@ DirectEvaportiveCooler
       - DecSsLumped
       - DecSysPhysicsBased
    - Examples
-        - DirectEvaporativeCoolerSystem
-        - DirectEvaporativeCoolerPressuredropValidation
    - BaseClasses
    - Records
