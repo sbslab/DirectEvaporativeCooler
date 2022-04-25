@@ -1,5 +1,6 @@
 # DirectEvaporativeCooler
 Modelica model for direct evaporative cooler
+<<<<<<< HEAD
 
 Direct evaporative coolers (DECs) are a low-energy cooling alternative to conventional air
 conditioning in hot-dry climates. The key component of DEC is the cooling pad/media, which
@@ -18,3 +19,5 @@ DirectEvaportiveCooler
    - Examples
    - BaseClasses
    - Records
+=======
+>>>>>>> 3ecfc1e7215a0c1a505dbb16d7d65e6c097ef124
