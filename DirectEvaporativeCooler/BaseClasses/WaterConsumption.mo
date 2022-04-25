@@ -13,13 +13,15 @@ block WaterConsumption
 
   //Real input and outpu
   Modelica.Blocks.Interfaces.RealInput m_a "mass flow rate of the air (kg/s)"
-    annotation (Placement(transformation(extent={{-114,38},{-74,78}}), iconTransformation(extent={{-140,-20},{-100,20}})));
+    annotation (Placement(transformation(extent={{-140,20},{-100,60}}),iconTransformation(extent={{-140,-20},{-100,20}})));
   Modelica.Blocks.Interfaces.RealInput w_in "Humidity ratio of the inlet water (kg/kg)"
-    annotation (Placement(transformation(extent={{-114,-16},{-74,24}}), iconTransformation(extent={{-140,40},{-100,80}})));
+    annotation (Placement(transformation(extent={{-140,-60},{-100,-20}}),
+                                                                        iconTransformation(extent={{-140,40},{-100,80}})));
   Modelica.Blocks.Interfaces.RealInput w_ou "Humidity ratio of the outlet water(kg/kg)"
-    annotation (Placement(transformation(extent={{-114,10},{-74,50}}), iconTransformation(extent={{-140,-80},{-100,-40}})));
+    annotation (Placement(transformation(extent={{-140,-20},{-100,20}}),
+                                                                       iconTransformation(extent={{-140,-80},{-100,-40}})));
   Modelica.Blocks.Interfaces.RealOutput m_eva "evaporatived water consumption in m3/s"
-    annotation (Placement(transformation(extent={{100,-10},{120,10}}), iconTransformation(
+    annotation (Placement(transformation(extent={{100,10},{120,30}}),  iconTransformation(
         extent={{-14,-14},{14,14}},
         rotation=0,
         origin={114,40})));

@@ -28,8 +28,8 @@ partial model PartialCoolingPad
   parameter DirectEvaporativeCooler.BaseClasses.CooPad CooPadTyp=DirectEvaporativeCooler.BaseClasses.CooPad.Lumped
     "Specifies the type of cooling pad based on the level of details : 1. Lumped  2.Physics-based" annotation (Dialog(group="Cooling pad type"));
 
-  parameter DirectEvaporativeCooler.BaseClasses.CooPadMaterial CooPadMaterial=DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Cellulose
-    "Various types of cooling pad materials/media such as Cellulose, Glass fiber, Paper, Coir, Aspen"
+  parameter DirectEvaporativeCooler.BaseClasses.CooPadMaterial CooPadMaterial=DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Celdek
+    "Various types of cooling pad materials/media such as Celdek, Glasdek, Paper, Coir, Aspen"
     annotation (Dialog(group="Cooling pad type", enable=not (CooPadTyp == DirectEvaporativeCooler.BaseClasses.CooPad.Lumped)));
 
   //Parameters common for lumped and physics based cooling pads
@@ -47,9 +47,8 @@ partial model PartialCoolingPad
   parameter Modelica.SIunits.ThermalConductivity K_value " Evaporative cooling pad thermal conductivity"
     annotation (Dialog(group="Evaporative cooler pad", enable=not (CooPadTyp == DirectEvaporativeCooler.BaseClasses.CooPad.Lumped)));
 
-  parameter Real Contact_surface_area = if CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Cellulose then 440
-  elseif CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.GlassFiber then 520
-  elseif CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Paper then 380
+  parameter Real Contact_surface_area = if CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Celdek then 440
+  elseif CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Glasdek then 520
   elseif CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Coir then 209
   else 299 "Surface area per unit volume in comact with air(m2/m3)"
     annotation (Dialog(group="Evaporative cooler pad", enable=not (CooPadTyp == DirectEvaporativeCooler.BaseClasses.CooPad.Lumped)));
@@ -135,8 +134,6 @@ partial model PartialCoolingPad
   Buildings.Fluid.Sensors.MassFractionTwoPort senMasFra(redeclare package Medium = Medium1,
     final m_flow_nominal=m1_flow_nominal,
     tau=tau1)                  "Mass fraction sensor (Humidity ratio)" annotation (Placement(transformation(extent={{-6,66},{6,54}})));
-  Buildings.Fluid.Sensors.MassFlowRate senMasFloW(redeclare final package Medium = Medium2, final allowFlowReversal=allowFlowReversal2) "Mass flow rate of water"
-    annotation (Placement(transformation(extent={{0,-66},{-12,-54}})));
   Buildings.Fluid.MixingVolumes.MixingVolume volWat(
     redeclare final package Medium = Medium2,
     final energyDynamics=energyDynamics,
@@ -167,6 +164,7 @@ partial model PartialCoolingPad
     final V=m1_flow_nominal*tau1/rho1_nominal) "Mixing volume - Air" annotation (Placement(transformation(extent={{60,60},{80,40}})));
   Buildings.Fluid.Sensors.MassFlowRate senMasFlo(redeclare final package Medium = Medium1, final allowFlowReversal=allowFlowReversal1) "Mass flow rate sensor"
     annotation (Placement(transformation(extent={{-26,66},{-14,54}})));
+  replaceable
   Buildings.Fluid.FixedResistances.PressureDrop dpPad(
     redeclare final package Medium = Medium1,
     final allowFlowReversal=allowFlowReversal1,
@@ -195,12 +193,6 @@ partial model PartialCoolingPad
         extent={{6,-6},{-6,6}},
         rotation=0,
         origin={26,-32})));
-
-  Buildings.HeatTransfer.Sources.PrescribedHeatFlow Qs "Sensible heat transfered into water"
-    annotation (Placement(transformation(
-        extent={{-6,6},{6,-6}},
-        rotation=180,
-        origin={26,-86})));
 
 
 
@@ -298,20 +290,19 @@ equation
       points={{6,60},{20,60}},
       color={0,127,255},
       thickness=0.5));
-  connect(MasFloRem.ports[1], volWat.ports[2]) annotation (Line(points={{-20,-40},{-70,-40},{-70,-60}},           color={0,127,255}));
-  connect(gain.y, MasFloRem.m_flow_in) annotation (Line(points={{19.4,-32},{0,-32}}, color={0,0,127}));
-  connect(volWat.heatPort, Qs.port) annotation (Line(points={{-60,-70},{-60,-86},{20,-86}}, color={191,0,0}));
+  connect(MasFloRem.ports[1], volWat.ports[2]) annotation (Line(points={{-20,-40},{-70,-40},{-70,-60}},           color={0,127,
+          255},
+      thickness=0.5));
+  connect(gain.y, MasFloRem.m_flow_in) annotation (Line(points={{19.4,-32},{0,-32}}, color={0,0,127},
+      pattern=LinePattern.Dash));
   connect(dpPip.port_a, port_a2)
     annotation (Line(
       points={{60,-60},{100,-60}},
       color={0,127,255},
       thickness=0.5));
-  connect(senMasFloW.port_a, dpPip.port_b) annotation (Line(
-      points={{-4.44089e-16,-60},{40,-60}},
-      color={0,127,255},
-      thickness=0.5));
-  connect(senMasFloW.port_b, volWat.ports[3]) annotation (Line(
-      points={{-12,-60},{-72.6667,-60}},
+  connect(dpPip.port_b, volWat.ports[3])
+    annotation (Line(
+      points={{40,-60},{-72.6667,-60}},
       color={0,127,255},
       thickness=0.5));
   annotation (Diagram(graphics={

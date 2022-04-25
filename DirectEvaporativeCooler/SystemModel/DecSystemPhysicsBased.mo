@@ -19,12 +19,13 @@ model DecSystemPhysicsBased "Model of Direct evaporative cooling system with pum
 
   //Parameters specific to physics based cooling pad
 
-  parameter BaseClasses.CooPadMaterial CooPadMaterial=DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Cellulose
-    "Various types of cooling pad materials/media such as Cellulose, Glass fiber, Paper, Coir, Aspen" annotation (Dialog(group="Cooling pad parameters"));
+  parameter BaseClasses.CooPadMaterial CooPadMaterial=DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Celdek
+    "Various types of cooling pad materials/media such as Cellulose, Gladek, Coir, Aspen" annotation (Dialog(group="Cooling pad parameters"));
 
-  parameter Real Contact_surface_area=if CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Cellulose then 400 elseif CooPadMaterial ==
-      DirectEvaporativeCooler.BaseClasses.CooPadMaterial.GlassFiber then 520 elseif CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Paper then 380
-       elseif CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Coir then 209 else 299 "Surface area per unit volume in comact with air(m2/m3)"
+  parameter Real Contact_surface_area=if CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Celdek then 400 elseif CooPadMaterial ==
+      DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Glasdek then 520 elseif CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Coir then 209
+ else
+     299 "Surface area per unit volume in comact with air(m2/m3)"
     annotation (Dialog(group="Cooling pad parameters"));
 
   parameter Modelica.SIunits.ThermalConductivity K_value=0.04 " Evaporative cooling pad thermal conductivity" annotation (Dialog(group="Cooling pad parameters"));
@@ -65,20 +66,21 @@ replaceable parameter Buildings.Fluid.Movers.Data.Generic perPum
     per=perFan,
     addPowerToMedium=true,
     y_start=1,
-    inputType=Buildings.Fluid.Types.InputType.Continuous)
+    inputType=Buildings.Fluid.Types.InputType.Continuous) "Fan model"
     annotation (Placement(transformation(extent={{-60,-10},{-40,10}})));
   Buildings.Fluid.Movers.FlowControlled_m_flow
                                            pum(redeclare final package Medium =
         MediumWater,
     m_flow_nominal=mW_flow_nominal,
     per=perPum,
-    dp_nominal=dp_pip_nominal)
+    dp_nominal=dp_pip_nominal) "Pump model"
     annotation (Placement(transformation(extent={{40,-50},{22,-30}})));
   Buildings.Fluid.Sources.Boundary_pT souWat(
     redeclare final package Medium = MediumWater,
-    nPorts=1) annotation (Placement(transformation(extent={{80,-50},{60,-30}})));
+    nPorts=1) "Water source"
+              annotation (Placement(transformation(extent={{80,-50},{60,-30}})));
   Buildings.Fluid.Sources.Boundary_pT sinWat(redeclare final package Medium =
-        MediumWater,                                                                       nPorts=1)
+        MediumWater,                                                                       nPorts=1) "Water sink"
     annotation (Placement(transformation(extent={{-60,-50},{-40,-30}})));
 
   ComponentModels.PhysicsBased
@@ -97,7 +99,8 @@ replaceable parameter Buildings.Fluid.Movers.Data.Generic perPum
     final K_value=K_value,
     final Contact_surface_area=Contact_surface_area,
     final DriftFactor=DriftFactor,
-    final Rcon=Rcon) annotation (Placement(transformation(extent={{-20,-16},{0,4}})));
+    final Rcon=Rcon) "Cooling pad model - Physics-based"
+                     annotation (Placement(transformation(extent={{-20,-16},{0,4}})));
 
   Modelica.Blocks.Sources.RealExpression pumPow(y=pum.P) "Power consumed by pump" annotation (Placement(transformation(extent={{60,70},{80,90}})));
   Modelica.Blocks.Sources.RealExpression fanPow(y=fan.P) "Power consumed by fan/blower"
@@ -106,6 +109,10 @@ replaceable parameter Buildings.Fluid.Movers.Data.Generic perPum
     annotation (Placement(transformation(extent={{100,70},{120,90}}), iconTransformation(extent={{100,70},{120,90}})));
   Modelica.Blocks.Interfaces.RealOutput fanP "Power consumed by fan to blow the air through the cooling pad"
     annotation (Placement(transformation(extent={{100,50},{120,70}}), iconTransformation(extent={{100,50},{120,70}})));
+  Modelica.Blocks.Interfaces.RealOutput watCon "Power consumed by fan to blow the air through the cooling pad"
+    annotation (Placement(transformation(extent={{100,30},{120,50}}), iconTransformation(extent={{100,30},{120,50}})));
+  Modelica.Blocks.Sources.RealExpression totWatCon(y=cooPad.WatCon.m_tot) "Power consumed by fan/blower"
+    annotation (Placement(transformation(extent={{60,30},{80,50}})));
 protected
   parameter Medium.ThermodynamicState sta_default=Medium.setState_pTX(
       T=Medium.T_default,
@@ -147,10 +154,19 @@ equation
       color={0,127,255},
       thickness=0.5));
   connect(fanP, fanP) annotation (Line(points={{110,60},{110,60}}, color={0,0,127}));
-  connect(fanPow.y, fanP) annotation (Line(points={{81,60},{110,60}}, color={0,0,127}));
-  connect(pumPow.y, pumP) annotation (Line(points={{81,80},{110,80}}, color={0,0,127}));
-  connect(fanSig, fan.Nrpm) annotation (Line(points={{-120,30},{-50,30},{-50,12}}, color={0,0,127}));
-  connect(pumSig, pum.m_flow_in) annotation (Line(points={{-120,80},{31,80},{31,-28}}, color={0,0,127}));
+  connect(fanPow.y, fanP) annotation (Line(points={{81,60},{110,60}}, color={0,0,127},
+      pattern=LinePattern.Dash));
+  connect(pumPow.y, pumP) annotation (Line(points={{81,80},{110,80}}, color={0,0,127},
+      pattern=LinePattern.Dash));
+  connect(fanSig, fan.Nrpm) annotation (Line(points={{-120,30},{-50,30},{-50,12}}, color={0,0,127},
+      pattern=LinePattern.Dash));
+  connect(pumSig, pum.m_flow_in) annotation (Line(points={{-120,80},{31,80},{31,-28}}, color={0,0,127},
+      pattern=LinePattern.Dash));
+  connect(totWatCon.y, watCon)
+    annotation (Line(
+      points={{81,40},{110,40}},
+      color={0,0,127},
+      pattern=LinePattern.Dash));
   annotation (
     Icon(coordinateSystem(preserveAspectRatio=false), graphics={
         Rectangle(

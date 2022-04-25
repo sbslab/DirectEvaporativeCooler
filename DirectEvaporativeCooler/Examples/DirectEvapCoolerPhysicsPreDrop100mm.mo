@@ -1,5 +1,6 @@
 within DirectEvaporativeCooler.Examples;
-model DirectEvapCoolerPhysicsPreDrop100mm
+model DirectEvapCoolerPhysicsPreDrop100mm "Example model to test the pressure drop across the cooling pad"
+
   extends Modelica.Icons.Example;
 
   //Medium model
@@ -7,7 +8,7 @@ model DirectEvapCoolerPhysicsPreDrop100mm
   package MediumAir = Buildings.Media.Air "Air medium";
 
   parameter Modelica.SIunits.MassFlowRate mW_flow_nominal=0.256 "Nominal mass flow rate on water side";
-  parameter Modelica.SIunits.MassFlowRate mA_flow_nominal=0.64 "Nominal mass flow rate on air side";
+  parameter Modelica.SIunits.MassFlowRate mA_flow_nominal=0.86 "Nominal mass flow rate on air side";
 
   parameter Modelica.SIunits.PressureDifference dpW_nominal=100 "Nominal pressure drop on the water side";
   parameter Modelica.SIunits.PressureDifference dpA_nominal=63 "Nominal pressure drop on the air side";
@@ -24,7 +25,7 @@ model DirectEvapCoolerPhysicsPreDrop100mm
     Thickness=0.1,
     Length=0.42,
     Height=0.42,
-    CooPadMaterial=DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Cellulose,
+    CooPadMaterial=DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Celdek,
     Contact_surface_area=361,
     perFan=HCT_45_2T,
     perPum=Breezair_Icon_pump)  "Direct evaporative cooling system" annotation (Placement(transformation(extent={{-30,30},{-10,50}})));
@@ -53,7 +54,7 @@ model DirectEvapCoolerPhysicsPreDrop100mm
     table=[0,108.0998278; 1,324.2994835; 2,540.4991391; 3,756.6987947; 4,972.8984504; 5,1189.098106; 6,1405.297762; 7,
         1621.497417],
     timeScale=300,
-    offset=2)                         "Fan Signal" annotation (Placement(transformation(extent={{-92,-6},{-80,6}})));
+    offset=2)                         "Fan Signal" annotation (Placement(transformation(extent={{-92,48},{-80,60}})));
 
   Modelica.Blocks.Sources.RealExpression PreSim(y=decSys.cooPad.dp_pad_cal)   "massflow rate of water consumed"
     annotation (Placement(transformation(extent={{144,-106},{160,-90}})));
@@ -75,7 +76,7 @@ model DirectEvapCoolerPhysicsPreDrop100mm
     annotation (Placement(transformation(extent={{144,-28},{160,-12}})));
   parameter Records.BreezairIcon170PumpCurve Breezair_Icon_pump
     annotation (Placement(transformation(extent={{-100,-136},{-80,-116}})));
-  parameter Records.HCT_45_2T HCT_45_2T annotation (Placement(transformation(extent={{-12,-126},{8,-106}})));
+  parameter Records.HCT_45_2T HCT_45_2T annotation (Placement(transformation(extent={{-66,-136},{-46,-116}})));
   Modelica.Blocks.Sources.RealExpression leL(y=(1/decSys.Contact_surface_area)/decSys.Thickness)
     "CFM through the cooler" annotation (Placement(transformation(extent={{-94,-52},{-78,-36}})));
 equation
@@ -100,7 +101,7 @@ equation
       color={0,127,255},
       thickness=0.5));
   connect(fanSig.y, decSys.fanSig) annotation (Line(
-      points={{-79.4,0},{-40,0},{-40,43},{-32,43}},
+      points={{-79.4,54},{-32,54},{-32,43}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(pumSig.y, decSys.pumSig) annotation (Line(
@@ -118,7 +119,7 @@ equation
   annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},{100,100}})), Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-120,
             -140},{220,100}})),
                           experiment(
-      StopTime=41400,
+      StopTime=2100,
       Interval=300,
       Tolerance=1e-06,
       __Dymola_Algorithm="Dassl"),

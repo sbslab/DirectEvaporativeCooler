@@ -5,7 +5,8 @@ block CoolingPadEfficiencyLumped "To compute the evaporative cooling pad efficie
   Modelica.Blocks.Interfaces.RealInput v_a "Velocity of the air (m/s)"
     annotation (Placement(transformation(extent={{-140,-20},{-100,20}}), iconTransformation(extent={{-140,-20},{-100,20}})));
   Modelica.Blocks.Interfaces.RealOutput pad_eff "Efficiency of the cooling pad "
-    annotation (Placement(transformation(extent={{92,-12},{112,8}}), iconTransformation(extent={{100,-14},{128,14}})));
+    annotation (Placement(transformation(extent={{100,-10},{120,10}}),
+                                                                     iconTransformation(extent={{100,-14},{128,14}})));
 
   //Parameters
   parameter Modelica.SIunits.Thickness d " Thickness of the cooling pad in m";

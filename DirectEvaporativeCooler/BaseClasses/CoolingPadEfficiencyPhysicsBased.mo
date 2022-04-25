@@ -9,7 +9,7 @@ block CoolingPadEfficiencyPhysicsBased
   parameter Real xi  "ξ, specific contact area or wetted surface area of the cooling pad, m2/m3";
 
   // Cooling pad media
-  parameter DirectEvaporativeCooler.BaseClasses.CooPadMaterial CooPadMaterial = DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Cellulose
+  parameter DirectEvaporativeCooler.BaseClasses.CooPadMaterial CooPadMaterial = DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Celdek
   "Various types of cooling pad materials/media such as Cellulose, Glass fiber, Paper, Coir, Aspen";
 
   //Constant and variables
@@ -41,12 +41,12 @@ block CoolingPadEfficiencyPhysicsBased
    Modelica.Blocks.Interfaces.RealInput Twb_in
     "Inlet wet bulb temperature of air,C"
      annotation (Placement(transformation(
-          extent={{-112,-94},{-72,-54}}),
+          extent={{-140,-60},{-100,-20}}),
                                         iconTransformation(extent={{-140,20},{-100,60}})));
   Modelica.Blocks.Interfaces.RealInput Tdb_in
     "Inlet Drybulb temperature of air,C"
      annotation (Placement(transformation(
-          extent={{-112,-68},{-72,-28}}),
+          extent={{-140,-20},{-100,20}}),
                                         iconTransformation(extent={{-20,-20},{20,20}},
         rotation=-90,
         origin={-60,120})));
@@ -67,12 +67,12 @@ block CoolingPadEfficiencyPhysicsBased
   Modelica.Blocks.Interfaces.RealOutput hc
     "Convective heat transfer coefficient"
      annotation (Placement(transformation(
-          extent={{100,-48},{120,-28}}),
+          extent={{100,-50},{120,-30}}),
                                       iconTransformation(extent={{100,-70},{120,-50}})));
   Modelica.Blocks.Interfaces.RealInput v_a
     "Velocity of air passing through the cooling pad , m/s"
      annotation (Placement(
-        transformation(extent={{-114,-8},{-74,32}}), iconTransformation(
+        transformation(extent={{-140,20},{-100,60}}),iconTransformation(
         extent={{-20,20},{20,-20}},
         rotation=0,
         origin={-120,-40})));
@@ -89,11 +89,10 @@ Re = (rho* v_a * d)/ Mu "Renyolds number";
 Pr = (Cpa * Mu)/ka "Prandtl number";
 
 // Step 2: Nusselts number varies for different cooling pad media
-Nu = if CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Cellulose then (0.10*((le/d)^(0.12))*(Re^0.8)*(Pr^0.33))
-  elseif CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.GlassFiber then (0.11*((le/d)^(0.12))*(Re^0.8)*(Pr^0.33))
-  elseif CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Paper then (0.07*((le/d)^(0.12))*(Re^0.8) * (Pr^0.33))
-  elseif CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Coir then 0.13*((le/d)^(0.12))*(Re^0.9) * (Pr^0.33)
-  else (0.35*((le/d)^(0.12))*(Re^0.8) * (Pr^0.33));
+Nu = if CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Celdek then (0.10*((le/d)^(0.12))*(Re^0.8)*(Pr^0.33))
+  elseif CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Glasdek then (0.07*((le/d)^(0.12))*(Re^0.8)*(Pr^0.33))
+  elseif CooPadMaterial == DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Coir then 0.53*((le/d)^(0.46))*(Re^0.9) * (Pr^0.33)
+  else (0.25*((le/d)^(0.12))*(Re^0.8) * (Pr^0.33));
 
 // Step 3: Calculating hc and hm based on Nusselts number
 hc = (Nu*ka)/le    "Lewis relationship between convective heat transfer coefficient and mass transfer coefficient (Le ~ 1 for water vapour and air)";

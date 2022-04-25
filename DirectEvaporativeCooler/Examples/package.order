@@ -2,5 +2,8 @@ DirectEvapCoolerLumped
 DirectEvapCoolerPhysics
 DirectEvapCoolerPhysicsPreDrop50mm
 DirectEvapCoolerPhysicsPreDrop100mm
-DirectEvaporativeCoolerSystemPadMaterials
-DirectEvaporativeCoolerPreCooling
+DirectEvapCoolerT305
+DirectEvapCoolerT311
+DirectEvapCoolerT316
+DpPadTest
+Testing

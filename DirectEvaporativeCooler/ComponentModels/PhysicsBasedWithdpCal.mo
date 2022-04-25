@@ -1,15 +1,21 @@
 within DirectEvaporativeCooler.ComponentModels;
-model PhysicsBased "Model for the Physics-based evaporative cooling pad"
+model PhysicsBasedWithdpCal
+  "Model for the Physics-based evaporative cooling pad with pressure drop calculations"
 
-  extends DirectEvaporativeCooler.BaseClasses.PartialCoolingPad(redeclare
-      Buildings.Fluid.FixedResistances.PressureDrop dpPad(            dp_nominal=dp_pad_nominal));
+  extends DirectEvaporativeCooler.BaseClasses.PartialCoolingPad(redeclare BaseClasses.dpPad dpPad(
+                                                                      dp_nominal=dp_pad_nominal,
+      Thickness=Thickness,
+      Length=Length,
+      Height=Height,
+      mW_flow_nominal=m2_flow_nominal,
+      Contact_surface_area=Contact_surface_area, rho = Eff_Phy.rho));
 
   BaseClasses.WaterConsumption WatCon(final f_drift=DriftFactor, final rCon=Rcon)
-    "Function module to calculate the water consumption"                          annotation (Placement(transformation(extent={{20,-20},{40,0}})));
+    "Function module to calculate the water consumption"                          annotation (Placement(transformation(extent={{20,-20},
+            {40,0}})));
 
  Modelica.SIunits.Velocity v_a "Nominal velocity of the air (m/s) at nominal flow rate";
  Modelica.SIunits.PressureDifference dp_pad_cal(displayUnit="Pa") "Velocity of the air (m/s)";
-
 
   BaseClasses.CoolingPadEfficiencyPhysicsBased Eff_Phy(
     final d=Thickness,
@@ -18,8 +24,7 @@ model PhysicsBased "Model for the Physics-based evaporative cooling pad"
     final xi=Contact_surface_area,
     final CooPadMaterial=CooPadMaterial,
     final p_atm=p_atm,
-    final k=K_value) "Function module to calculate efficiency "
-                                    annotation (Placement(transformation(extent={{-44,0},{-24,20}})));
+    final k=K_value)                annotation (Placement(transformation(extent={{-44,0},{-24,20}})));
   BaseClasses.HeatTransfer HeaTraPhy(A=PadArea) "Function module to calculate the heat transfer"
                                                      annotation (Placement(transformation(extent={{20,20},{40,40}})));
 equation
@@ -30,7 +35,6 @@ equation
 
    // v_a_nominal = (m1_flow_nominal*1.225)/PadArea;
    // dp_pad_cal = 5.5*(((1/Contact_surface_area)/Thickness)^(-0.469))*(1 + (m2_flow_nominal^1.139))*(v_a_nominal^2);
-
 
   connect(senTem.T, HeaTraPhy.Tdb_in)
     annotation (Line(
@@ -87,8 +91,8 @@ equation
     annotation (Line(points={{41.4,-6},{48,-6},{48,42},{58,42}},         color={0,0,127},
       pattern=LinePattern.Dash));
   connect(senMasFlo.m_flow, HeaTraPhy.ma) annotation (Line(
-      points={{-20,53.4},{-20,32},{18.1818,32},{18.1818,32}},
+      points={{-20,53.4},{-20,32},{18.1818,32}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false)),defaultComponentName="cooPad", Diagram(coordinateSystem(preserveAspectRatio=false)));
-end PhysicsBased;
+end PhysicsBasedWithdpCal;

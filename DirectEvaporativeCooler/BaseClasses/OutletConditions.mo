@@ -23,27 +23,23 @@ block OutletConditions
   Modelica.Blocks.Interfaces.RealInput eff
   "Efficiency of the cooling pad"
    annotation (Placement(
-        transformation(extent={{-140,-100},{-100,-60}}),
-                                                       iconTransformation(
-          extent={{-140,-100},{-100,-60}})));
+        transformation(extent={{-140,-80},{-100,-40}}),iconTransformation(
+          extent={{-140,-80},{-100,-40}})));
   Modelica.Blocks.Interfaces.RealInput Twb_in
   "Inlet Wet bulb temperature"
    annotation (Placement(
-        transformation(extent={{-140,10},{-100,50}}),iconTransformation(extent={{-140,10},{-100,50}})));
+        transformation(extent={{-140,0},{-100,40}}), iconTransformation(extent={{-140,0},{-100,40}})));
   Modelica.Blocks.Interfaces.RealInput Tdb_in
   "Inlet drybulb temperature"
    annotation (Placement(
-        transformation(extent={{-140,60},{-100,100}}),
-                                                     iconTransformation(extent={{-140,60},{-100,100}})));
+        transformation(extent={{-140,40},{-100,80}}),iconTransformation(extent={{-140,40},{-100,80}})));
   Modelica.Blocks.Interfaces.RealOutput w_ou
   "Humidity ratio of the exit air"
-    annotation (Placement(transformation(extent={{100,30},{120,50}}),iconTransformation(extent={{100,6},{128,34}})));
-  Modelica.Blocks.Interfaces.RealOutput qS
-  "Sensible heat transfer"
-   annotation (Placement(transformation(extent={{100,30},{120,50}}), iconTransformation(extent={{100,-34},{128,-6}})));
+    annotation (Placement(transformation(extent={{100,-10},{120,10}}),
+                                                                     iconTransformation(extent={{100,-14},{128,14}})));
   Modelica.Blocks.Interfaces.RealInput m_a
   "Mass flow rate of air"
-    annotation (Placement(transformation(extent={{-140,10},{-100,50}}), iconTransformation(extent={{-140,-50},{-100,-10}})));
+    annotation (Placement(transformation(extent={{-140,-38},{-100,2}}), iconTransformation(extent={{-140,-38},{-100,2}})));
 
 equation
 
@@ -68,8 +64,6 @@ Tdp =  (237.3*B)/(1-B) "Dew point temperature of the outlet air";
 p_wat =  (6.11* 10^((7.5*Tdp)/(237.3+Tdp)))*100 "Partial pressure of water vapour of the outlet air";
 w_ou=  Buildings.Utilities.Psychrometrics.Functions.X_pW(p_wat);
 
-// Step 5: Determining the sensible heat transered = laten heat transfered in the process of evaporative cooling
-qS = m_a*1000*(Tdb_in - Tdb_ou) "Sensible heat transfered";
 
   annotation (Icon(coordinateSystem(preserveAspectRatio=false)),defaultComponentName="outCon", Diagram(
         coordinateSystem(preserveAspectRatio=false)));

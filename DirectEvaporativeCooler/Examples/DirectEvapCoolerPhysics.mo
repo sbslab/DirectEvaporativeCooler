@@ -1,5 +1,6 @@
 within DirectEvaporativeCooler.Examples;
-model DirectEvapCoolerPhysics
+model DirectEvapCoolerPhysics "Example model to test the DecSysPhysics"
+
   extends Modelica.Icons.Example;
 
   //Medium model
@@ -24,7 +25,7 @@ model DirectEvapCoolerPhysics
     Thickness=0.1,
     Length=2.034,
     Height=1,
-    CooPadMaterial=DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Cellulose,
+    CooPadMaterial=DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Celdek,
     perFan=Breezair_Icon_fan,
     perPum=Breezair_Icon_pump)  "Direct evaporative cooling system" annotation (Placement(transformation(extent={{-30,30},{-10,50}})));
   Buildings.Fluid.Sources.Boundary_pT sou(
@@ -78,14 +79,12 @@ model DirectEvapCoolerPhysics
   Modelica.Blocks.Sources.RealExpression preDrop(y=decSys.port_a.p - decSys.port_b.p) "Pressure drop"
     annotation (Placement(transformation(extent={{-96,-48},{-80,-32}})));
   Modelica.Blocks.Sources.RealExpression watCon(y=decSys.cooPad.WatCon.m_eva) "massflow rate of water consumed"
-    annotation (Placement(transformation(extent={{44,-108},{60,-92}})));
+    annotation (Placement(transformation(extent={{24,-106},{40,-90}})));
   Modelica.Blocks.Sources.RealExpression preDropCal(y=decSys.cooPad.dp_pad_cal)
                                                                  "Pressure drop calculated" annotation (Placement(transformation(extent={{-96,-68},{-80,-52}})));
   Modelica.Blocks.Math.Add preDroModErr(k1=-1) "Pressure drop error in the model" annotation (Placement(transformation(extent={{-60,-60},{-40,-40}})));
-  Modelica.Blocks.Math.Add preDroDatErr(k2=-1) "Pressure drop error in the data" annotation (Placement(transformation(extent={{-60,-110},{-40,-90}})));
-  Modelica.Blocks.Sources.RealExpression preDrop1(y=decSys.port_a.p - decSys.port_b.p) "Pressure drop"
-    annotation (Placement(transformation(extent={{-96,-96},{-80,-80}})));
-  Modelica.Blocks.Math.Add effDatErr(k2=-1) "Efficiency error" annotation (Placement(transformation(extent={{80,-62},{100,-42}})));
+  Modelica.Blocks.Math.Add effDatErr(k2=-1) "Efficiency error" annotation (Placement(transformation(extent={{60,-60},{
+            80,-40}})));
   Modelica.Blocks.Sources.TimeTable effData(table=[0,91.5; 1,92.3; 2,92.2; 3,
         91.6; 4,84.1; 5,92.5; 6,88.5; 7,87.6; 8,88.7; 9,89.9; 10,88.5; 11,86;
         12,86.1; 13,85.7; 14,86.3; 15,86; 16,87.6; 17,86.4; 18,84.1; 19,84.2;
@@ -93,7 +92,7 @@ model DirectEvapCoolerPhysics
         28,84.8; 29,84.6; 30,84.9; 31,84.7; 32,84.6; 33,84.9; 34,84.8; 35,84.7;
         36,84.8; 37,84.6; 38,84.9; 39,84.6; 40,81.9; 41,81.9; 42,80.6; 43,83.1;
         44,82.1; 45,83.6; 46,83.8], timeScale=900)
-                                            annotation (Placement(transformation(extent={{40,-72},{60,-52}})));
+                                            annotation (Placement(transformation(extent={{20,-70},{40,-50}})));
   Modelica.Blocks.Sources.TimeTable watConData(table=[0,0.0039976; 1,0.0032612;
         2,0.0017884; 3,0.0059964; 4,0.0044184; 5,0.0054704; 6,0.0059964; 7,
         0.0037872; 8,0.0086264; 9,0.009468; 10,0.0092576; 11,0.00789; 12,
@@ -104,27 +103,28 @@ model DirectEvapCoolerPhysics
         0.0119928; 33,0.012098; 34,0.0118876; 35,0.0119928; 36,0.012098; 37,
         0.0119928; 38,0.012098; 39,0.0119928; 40,0.0116772; 41,0.0103096; 42,
         0.0071536; 43,0.0151488; 44,0.0117824; 45,0.0187256; 46,0.0160956; 47,0], timeScale=900)
-                                               annotation (Placement(transformation(extent={{40,-134},{60,-114}})));
-  Modelica.Blocks.Math.Add watConDatErr(k2=-1) "Water consumption error in the data" annotation (Placement(transformation(extent={{80,-122},{100,-102}})));
+                                               annotation (Placement(transformation(extent={{20,-132},{40,-112}})));
+  Modelica.Blocks.Math.Add watConDatErr(k2=-1) "Water consumption error in the data" annotation (Placement(transformation(extent={{60,-120},
+            {80,-100}})));
   parameter Records.BreezairIcon170FanCurve Breezair_Icon_fan
-    annotation (Placement(transformation(extent={{-112,-132},{-92,-112}})));
+    annotation (Placement(transformation(extent={{-66,-122},{-46,-102}})));
   Modelica.Blocks.Sources.RealExpression Powe(y=decSys.pumPow.y + decSys.fanPow.y)
-    "Saturation efficiency" annotation (Placement(transformation(extent={{144,-48},{160,-32}})));
+    "Saturation efficiency" annotation (Placement(transformation(extent={{144,-88},{160,-72}})));
   Modelica.Blocks.Math.Add PowDatErr(k2=-1) "Efficiency error"
-    annotation (Placement(transformation(extent={{180,-60},{200,-40}})));
+    annotation (Placement(transformation(extent={{180,-100},{200,-80}})));
   Modelica.Blocks.Sources.TimeTable Power(table=[0,102; 1,103; 2,102; 3,107; 4,104; 5,102; 6,195; 7,243;
         8,199; 9,193; 10,244; 11,379; 12,379; 13,376; 14,376; 15,423; 16,372; 17,435; 18,700; 19,694; 20,
         695; 21,705; 22,734; 23,701; 24,686; 25,749; 26,692; 27,703; 28,693; 29,704; 30,694; 31,706; 32,
         706; 33,702; 34,694; 35,707; 36,705; 37,708; 38,708; 39,712; 40,1204; 41,1194; 42,1187; 43,1197;
         44,1200; 45,1193; 46,1200], timeScale=900)
-    annotation (Placement(transformation(extent={{140,-80},{160,-60}})));
+    annotation (Placement(transformation(extent={{140,-120},{160,-100}})));
   Modelica.Blocks.Sources.RealExpression CFM(y=(decSys.m_flow/1.225)*2118.88) "CFM through the cooler"
-    annotation (Placement(transformation(extent={{144,-28},{160,-12}})));
+    annotation (Placement(transformation(extent={{144,-68},{160,-52}})));
   Modelica.Blocks.Sources.RealExpression Efficiency(y=((Tou.y - senTem.T)/(Tou.y - senWetBul.T))*100)
     "Saturation efficiency"
-    annotation (Placement(transformation(extent={{44,-48},{60,-32}})));
+    annotation (Placement(transformation(extent={{24,-46},{40,-30}})));
   parameter Records.BreezairIcon170PumpCurve Breezair_Icon_pump
-    annotation (Placement(transformation(extent={{-142,-132},{-122,-112}})));
+    annotation (Placement(transformation(extent={{-96,-122},{-76,-102}})));
 equation
   connect(sou.ports[1], decSys.port_a) annotation (Line(
       points={{-46,40},{-38,40},{-38,40},{-30,40}},
@@ -164,18 +164,16 @@ equation
       pattern=LinePattern.Dash));
   connect(preDrop.y, preDroModErr.u1) annotation (Line(points={{-79.2,-40},{-68,-40},{-68,-44},{-62,-44}}, color={0,0,127}));
   connect(preDropCal.y, preDroModErr.u2) annotation (Line(points={{-79.2,-60},{-70,-60},{-70,-56},{-62,-56}}, color={0,0,127}));
-  connect(preDroDatErr.u1, preDrop1.y) annotation (Line(points={{-62,-94},{-70,-94},{-70,-88},{-79.2,-88}}, color={0,0,127}));
-  connect(effData.y, effDatErr.u2) annotation (Line(points={{61,-62},{70,-62},{70,-58},{78,-58}}, color={0,0,127}));
-  connect(watCon.y, watConDatErr.u1) annotation (Line(points={{60.8,-100},{72,-100},{72,-106},{78,-106}}, color={0,0,127}));
-  connect(watConData.y, watConDatErr.u2) annotation (Line(points={{61,-124},{70,-124},{70,-118},{78,-118}}, color={0,0,127}));
-  connect(preDrop1.y, preDroDatErr.u2)
-    annotation (Line(points={{-79.2,-88},{-70,-88},{-70,-106},{-62,-106}}, color={0,0,127}));
+  connect(effData.y, effDatErr.u2) annotation (Line(points={{41,-60},{50,-60},{50,-56},{58,-56}}, color={0,0,127}));
+  connect(watCon.y, watConDatErr.u1) annotation (Line(points={{40.8,-98},{52,-98},{52,-104},{58,-104}},   color={0,0,127}));
+  connect(watConData.y, watConDatErr.u2) annotation (Line(points={{41,-122},{50,-122},{50,-116},{58,-116}}, color={0,0,127}));
   connect(PowDatErr.u1, Powe.y)
-    annotation (Line(points={{178,-44},{168,-44},{168,-40},{160.8,-40}}, color={0,0,127}));
+    annotation (Line(points={{178,-84},{168,-84},{168,-80},{160.8,-80}}, color={0,0,127}));
   connect(Power.y, PowDatErr.u2)
-    annotation (Line(points={{161,-70},{168,-70},{168,-56},{178,-56}}, color={0,0,127}));
+    annotation (Line(points={{161,-110},{168,-110},{168,-96},{178,-96}},
+                                                                       color={0,0,127}));
   connect(Efficiency.y, effDatErr.u1)
-    annotation (Line(points={{60.8,-40},{68,-40},{68,-46},{78,-46}}, color={0,0,127}));
+    annotation (Line(points={{40.8,-38},{48,-38},{48,-44},{58,-44}}, color={0,0,127}));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},{100,100}})), Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-120,
             -140},{220,100}})),
                           experiment(

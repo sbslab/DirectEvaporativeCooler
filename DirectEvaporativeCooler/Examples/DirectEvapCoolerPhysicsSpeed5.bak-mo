@@ -1,6 +1,5 @@
 within DirectEvaporativeCooler.Examples;
-model DirectEvapCoolerLumped "Example model to test the DecSysLumped"
-
+model DirectEvapCoolerPhysicsSpeed5
   extends Modelica.Icons.Example;
 
   //Medium model
@@ -11,20 +10,23 @@ model DirectEvapCoolerLumped "Example model to test the DecSysLumped"
   parameter Modelica.SIunits.MassFlowRate mA_flow_nominal=3.12 "Nominal mass flow rate on air side";
 
   parameter Modelica.SIunits.PressureDifference dpW_nominal=100 "Nominal pressure drop on the water side";
-  parameter Modelica.SIunits.PressureDifference dpA_nominal=170 "Nominal pressure drop on the air side";
+  parameter Modelica.SIunits.PressureDifference dpA_nominal=140 "Nominal pressure drop on the air side";
   parameter Modelica.SIunits.PressureDifference dpD_nominal=74 "Nominal pressure drop across the duct";
 
-  SystemModel.DecSysLumped decSys(
+  SystemModel.DecSystemPhysicsBased
+                           decSys(
     redeclare package Medium = MediumAir,
     m_flow_nominal=mA_flow_nominal,
+    dp_nominal=dpA_nominal,
     mW_flow_nominal=mW_flow_nominal,
     dp_pad_nominal(displayUnit="Pa") = dpA_nominal,
     dp_pip_nominal(displayUnit="Pa") = dpW_nominal,
     Thickness=0.1,
     Length=2.034,
     Height=1,
+    CooPadMaterial=DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Cellulose,
     perFan=Breezair_Icon_fan,
-    perPum=Breezair_Icon_pump) "Direct evaporative cooling system"  annotation (Placement(transformation(extent={{-30,30},{-10,50}})));
+    perPum=Breezair_Icon_pump)  "Direct evaporative cooling system" annotation (Placement(transformation(extent={{-30,30},{-10,50}})));
   Buildings.Fluid.Sources.Boundary_pT sou(
     redeclare package Medium = MediumAir,
     use_Xi_in=true,
@@ -54,7 +56,7 @@ model DirectEvapCoolerLumped "Example model to test the DecSysLumped"
         530; 42,530; 43,530; 44,530; 45,530; 46,530; 47,530], timeScale=900)
                                       "Fan Signal" annotation (Placement(transformation(extent={{-92,-6},{-80,6}})));
   Modelica.Blocks.Sources.TimeTable
-                               TOu(table=[0,305; 1,305; 2,305; 3,311; 4,316; 5,
+                               Tou(table=[0,305; 1,305; 2,305; 3,311; 4,316; 5,
         316; 6,305; 7,305; 8,311; 9,316; 10,316; 11,305; 12,305; 13,305; 14,311;
         15,311; 16,316; 17,316; 18,305; 19,305; 20,305; 21,311; 22,311; 23,316;
         24,316; 25,316; 26,311; 27,311; 28,311; 29,311; 30,311; 31,311; 32,311;
@@ -62,7 +64,7 @@ model DirectEvapCoolerLumped "Example model to test the DecSysLumped"
         42,305; 43,311; 44,311; 45,316; 46,316; 47,318], timeScale=900)
                                    "Outdoor temperature" annotation (Placement(transformation(extent={{-92,38},{-80,50}})));
   Modelica.Blocks.Sources.TimeTable
-                               wIn(table=[0,0.00745; 1,0.011118; 2,0.015231; 3,
+                               win(table=[0,0.00745; 1,0.011118; 2,0.015231; 3,
         0.005191; 4,0.00294; 5,0.010604; 6,0.00745; 7,0.015231; 8,0.005191; 9,
         0.006547; 10,0.010604; 11,0.00745; 12,0.011118; 13,0.015231; 14,
         0.005191; 15,0.012908; 16,0.006547; 17,0.010604; 18,0.00745; 19,
@@ -73,14 +75,12 @@ model DirectEvapCoolerLumped "Example model to test the DecSysLumped"
         0.008823; 40,0.00745; 41,0.011118; 42,0.015231; 43,0.005191; 44,
         0.012908; 45,0.006547; 46,0.010604; 47,0], timeScale=900)
                                    "Inlet humidity ratio" annotation (Placement(transformation(extent={{-92,14},{-80,26}})));
-  Modelica.Blocks.Sources.RealExpression Efficiency(y=((TOu.y - senTem.T)/(TOu.y - senWetBul.T))*100)
-    "Saturation efficiency"
-    annotation (Placement(transformation(extent={{44,-50},{60,-34}})));
   Modelica.Blocks.Sources.RealExpression preDrop(y=decSys.port_a.p - decSys.port_b.p) "Pressure drop"
     annotation (Placement(transformation(extent={{-96,-48},{-80,-32}})));
-  Modelica.Blocks.Sources.RealExpression watCon(y=decSys.cooPad.watCon.m_eva) "massflow rate of water consumed"
+  Modelica.Blocks.Sources.RealExpression watCon(y=decSys.cooPad.WatCon.m_eva) "massflow rate of water consumed"
     annotation (Placement(transformation(extent={{44,-108},{60,-92}})));
-  Modelica.Blocks.Sources.RealExpression preDropCal(y=decSys.dp) "Pressure drop calculated" annotation (Placement(transformation(extent={{-96,-68},{-80,-52}})));
+  Modelica.Blocks.Sources.RealExpression preDropCal(y=decSys.cooPad.dp_pad_cal)
+                                                                 "Pressure drop calculated" annotation (Placement(transformation(extent={{-96,-68},{-80,-52}})));
   Modelica.Blocks.Math.Add preDroModErr(k1=-1) "Pressure drop error in the model" annotation (Placement(transformation(extent={{-60,-60},{-40,-40}})));
   Modelica.Blocks.Math.Add effDatErr(k2=-1) "Efficiency error" annotation (Placement(transformation(extent={{80,-62},{100,-42}})));
   Modelica.Blocks.Sources.TimeTable effData(table=[0,91.5; 1,92.3; 2,92.2; 3,
@@ -104,21 +104,24 @@ model DirectEvapCoolerLumped "Example model to test the DecSysLumped"
                                                annotation (Placement(transformation(extent={{40,-134},{60,-114}})));
   Modelica.Blocks.Math.Add watConDatErr(k2=-1) "Water consumption error in the data" annotation (Placement(transformation(extent={{80,-122},{100,-102}})));
   parameter Records.BreezairIcon170FanCurve Breezair_Icon_fan
-    annotation (Placement(transformation(extent={{-64,-120},{-44,-100}})));
-  Modelica.Blocks.Sources.RealExpression Powe(y=decSys.pumPow.y + decSys.fanPow.y) "Saturation efficiency"
-                            annotation (Placement(transformation(extent={{146,-98},{162,-82}})));
+    annotation (Placement(transformation(extent={{-66,-122},{-46,-102}})));
+  Modelica.Blocks.Sources.RealExpression Powe(y=decSys.pumPow.y + decSys.fanPow.y)
+    "Saturation efficiency" annotation (Placement(transformation(extent={{144,-48},{160,-32}})));
   Modelica.Blocks.Math.Add PowDatErr(k2=-1) "Efficiency error"
-    annotation (Placement(transformation(extent={{182,-110},{202,-90}})));
+    annotation (Placement(transformation(extent={{180,-60},{200,-40}})));
   Modelica.Blocks.Sources.TimeTable Power(table=[0,102; 1,103; 2,102; 3,107; 4,104; 5,102; 6,195; 7,243;
         8,199; 9,193; 10,244; 11,379; 12,379; 13,376; 14,376; 15,423; 16,372; 17,435; 18,700; 19,694; 20,
         695; 21,705; 22,734; 23,701; 24,686; 25,749; 26,692; 27,703; 28,693; 29,704; 30,694; 31,706; 32,
         706; 33,702; 34,694; 35,707; 36,705; 37,708; 38,708; 39,712; 40,1204; 41,1194; 42,1187; 43,1197;
         44,1200; 45,1193; 46,1200], timeScale=900)
-    annotation (Placement(transformation(extent={{142,-130},{162,-110}})));
+    annotation (Placement(transformation(extent={{140,-80},{160,-60}})));
   Modelica.Blocks.Sources.RealExpression CFM(y=(decSys.m_flow/1.225)*2118.88) "CFM through the cooler"
-    annotation (Placement(transformation(extent={{174,-66},{190,-50}})));
+    annotation (Placement(transformation(extent={{144,-28},{160,-12}})));
+  Modelica.Blocks.Sources.RealExpression Efficiency(y=((Tou.y - senTem.T)/(Tou.y - senWetBul.T))*100)
+    "Saturation efficiency"
+    annotation (Placement(transformation(extent={{44,-48},{60,-32}})));
   parameter Records.BreezairIcon170PumpCurve Breezair_Icon_pump
-    annotation (Placement(transformation(extent={{-90,-120},{-70,-100}})));
+    annotation (Placement(transformation(extent={{-96,-122},{-76,-102}})));
 equation
   connect(sou.ports[1], decSys.port_a) annotation (Line(
       points={{-46,40},{-38,40},{-38,40},{-30,40}},
@@ -148,25 +151,25 @@ equation
       points={{-79.4,66},{-32,66},{-32,48}},
       color={0,0,127},
       pattern=LinePattern.Dash));
-  connect(sou.T_in,TOu. y) annotation (Line(
+  connect(sou.T_in, Tou.y) annotation (Line(
       points={{-68,44},{-79.4,44}},
       color={0,0,127},
       pattern=LinePattern.Dash));
-  connect(wIn.y, sou.Xi_in[1]) annotation (Line(
+  connect(win.y, sou.Xi_in[1]) annotation (Line(
       points={{-79.4,20},{-74,20},{-74,36},{-68,36}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(preDrop.y, preDroModErr.u1) annotation (Line(points={{-79.2,-40},{-68,-40},{-68,-44},{-62,-44}}, color={0,0,127}));
   connect(preDropCal.y, preDroModErr.u2) annotation (Line(points={{-79.2,-60},{-70,-60},{-70,-56},{-62,-56}}, color={0,0,127}));
-  connect(effDatErr.u1, Efficiency.y) annotation (Line(points={{78,-46},{68,-46},{68,-42},{60.8,-42}}, color={0,0,127}));
   connect(effData.y, effDatErr.u2) annotation (Line(points={{61,-62},{70,-62},{70,-58},{78,-58}}, color={0,0,127}));
   connect(watCon.y, watConDatErr.u1) annotation (Line(points={{60.8,-100},{72,-100},{72,-106},{78,-106}}, color={0,0,127}));
   connect(watConData.y, watConDatErr.u2) annotation (Line(points={{61,-124},{70,-124},{70,-118},{78,-118}}, color={0,0,127}));
   connect(PowDatErr.u1, Powe.y)
-    annotation (Line(points={{180,-94},{170,-94},{170,-90},{162.8,-90}}, color={0,0,127}));
+    annotation (Line(points={{178,-44},{168,-44},{168,-40},{160.8,-40}}, color={0,0,127}));
   connect(Power.y, PowDatErr.u2)
-    annotation (Line(points={{163,-120},{170,-120},{170,-106},{180,-106}},
-                                                                       color={0,0,127}));
+    annotation (Line(points={{161,-70},{168,-70},{168,-56},{178,-56}}, color={0,0,127}));
+  connect(Efficiency.y, effDatErr.u1)
+    annotation (Line(points={{60.8,-40},{68,-40},{68,-46},{78,-46}}, color={0,0,127}));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},{100,100}})), Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-120,
             -140},{220,100}})),
                           experiment(
@@ -174,6 +177,6 @@ equation
       Interval=300,
       Tolerance=1e-06,
       __Dymola_Algorithm="Dassl"),
-       __Dymola_Commands(file="modelica://DirectEvaporativeCooler/Scripts/DirectEvapCoolerLumped.mos"
+       __Dymola_Commands(file="modelica://DirectEvaporativeCooler/Scripts/DirectEvapCoolerPhysics.mos"
         "Simulate and plot"));
-end DirectEvapCoolerLumped;
+end DirectEvapCoolerPhysicsSpeed5;

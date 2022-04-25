@@ -1,5 +1,6 @@
 within DirectEvaporativeCooler.Examples;
-model DirectEvapCoolerPhysicsPreDrop50mm
+model DirectEvapCoolerPhysicsPreDrop50mm "Example model to test the pressure drop across the cooling pad"
+
   extends Modelica.Icons.Example;
 
   //Medium model
@@ -13,7 +14,7 @@ model DirectEvapCoolerPhysicsPreDrop50mm
   parameter Modelica.SIunits.PressureDifference dpA_nominal=63 "Nominal pressure drop on the air side";
   parameter Modelica.SIunits.PressureDifference dpD_nominal=10 "Nominal pressure drop across the duct";
 
-  SystemModel.DecSystemPhysicsBased
+  SystemModel.DecSystemPhysicsBasedWithdpCal
                            decSys(
     redeclare package Medium = MediumAir,
     m_flow_nominal=mA_flow_nominal,
@@ -24,7 +25,7 @@ model DirectEvapCoolerPhysicsPreDrop50mm
     Thickness=0.05,
     Length=0.42,
     Height=0.42,
-    CooPadMaterial=DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Cellulose,
+    CooPadMaterial=DirectEvaporativeCooler.BaseClasses.CooPadMaterial.Celdek,
     Contact_surface_area=556,
     perFan=HCT_45_2T,
     perPum=Breezair_Icon_pump)  "Direct evaporative cooling system" annotation (Placement(transformation(extent={{-30,30},{-10,50}})));
@@ -72,10 +73,10 @@ model DirectEvapCoolerPhysicsPreDrop50mm
   Modelica.Blocks.Sources.RealExpression CFM(y=(decSys.m_flow/1.225)*2118.88) "CFM through the cooler"
     annotation (Placement(transformation(extent={{144,-28},{160,-12}})));
   parameter Records.BreezairIcon170PumpCurve Breezair_Icon_pump
-    annotation (Placement(transformation(extent={{-100,-136},{-80,-116}})));
-  parameter Records.HCT_45_2T HCT_45_2T annotation (Placement(transformation(extent={{-12,-126},{8,-106}})));
+    annotation (Placement(transformation(extent={{-100,-116},{-80,-96}})));
+  parameter Records.HCT_45_2T HCT_45_2T annotation (Placement(transformation(extent={{-64,-116},{-44,-96}})));
   Modelica.Blocks.Sources.RealExpression leL(y=(1/decSys.Contact_surface_area)/decSys.Thickness)
-    "CFM through the cooler" annotation (Placement(transformation(extent={{-94,-52},{-78,-36}})));
+    "CFM through the cooler" annotation (Placement(transformation(extent={{144,-8},{160,8}})));
 equation
   connect(sou.ports[1], decSys.port_a) annotation (Line(
       points={{-46,40},{-38,40},{-38,40},{-30,40}},
@@ -116,7 +117,7 @@ equation
   annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},{100,100}})), Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-120,
             -140},{220,100}})),
                           experiment(
-      StopTime=41400,
+      StopTime=2100,
       Interval=300,
       Tolerance=1e-06,
       __Dymola_Algorithm="Dassl"),
