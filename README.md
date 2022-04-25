@@ -17,8 +17,6 @@ DirectEvaportiveCooler
       - DecSysPhysicsBased
    - Examples
         - DirectEvaporativeCoolerSystem
-        - DirectEvaporativeCoolerSystemPadMaterials
-        - DirectEvaporativeCoolerPreCooling
         - DirectEvaporativeCoolerPressuredropValidation
    - BaseClasses
    - Records
